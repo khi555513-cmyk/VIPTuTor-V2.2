@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   FileText, Clock, Upload, CheckCircle, AlertCircle, 
@@ -107,7 +108,7 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3-pro-preview',
         contents: { parts: [{ text: prompt }] },
         config: {
           systemInstruction: TEST_GENERATOR_PROMPT,
@@ -228,7 +229,7 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash', 
+        model: 'gemini-3-pro-preview', 
         contents: { parts: [{ text: prompt }] },
         config: {
           systemInstruction: TEST_GRADER_PROMPT,

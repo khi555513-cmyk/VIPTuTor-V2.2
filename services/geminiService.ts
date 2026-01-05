@@ -1,4 +1,5 @@
 
+
 import { GoogleGenAI } from "@google/genai";
 import { Attachment, TutorMode } from '../types';
 import { getSystemInstruction } from '../constants';
@@ -48,9 +49,9 @@ export const clearApiKey = () => {
 export const validateApiKey = async (key: string): Promise<{valid: boolean, error?: string}> => {
   try {
     const ai = new GoogleGenAI({ apiKey: key });
-    // Use gemini-1.5-flash for validation as it is the most stable/available model for connection checks
+    // Use gemini-3-flash-preview for validation as it is the most stable/available model for connection checks
     await ai.models.generateContent({
-      model: 'gemini-1.5-flash', 
+      model: 'gemini-3-flash-preview', 
       contents: { parts: [{ text: "ping" }] },
     });
     return { valid: true };
@@ -127,13 +128,11 @@ export const generateTutorResponse = async (
 
     // --- MODEL SELECTION STRATEGY ---
     // 1. Primary: Gemini 3 Flash Preview (As per latest coding guidelines)
-    // 2. Secondary: Gemini 2.0 Flash Exp (Recent powerful model)
-    // 3. Fallback: Gemini 1.5 Pro (Reliable stable model)
+    // 2. Secondary: Gemini 3 Pro Preview (For complex reasoning fallback)
     
     const modelsToTry = [
         'gemini-3-flash-preview', 
-        'gemini-2.0-flash-exp', 
-        'gemini-1.5-pro'
+        'gemini-3-pro-preview', 
     ];
 
     let lastError;
