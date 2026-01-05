@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Send, Paperclip, X, Save, Sparkles, BookOpen, GraduationCap, Copy, 
@@ -344,7 +346,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             data={gameData} 
             onRequestFullScreen={onPlayGame}
             onPlayLater={(data) => {
-              onAddNotification({ id: Date.now().toString(), title: 'Game saved', message: `Game "${data.title}" saved.`, type: 'achievement', timestamp: Date.now(), isRead: false });
+              onAddNotification({ 
+                id: Date.now().toString(), 
+                title: 'Đã lưu Mini Game 🎮', 
+                message: `Game "${data.title}" đã được lưu. Nhấn để chơi ngay!`, 
+                type: 'achievement', 
+                timestamp: Date.now(), 
+                isRead: false,
+                gameData: data 
+              });
             }}
           />
         );
@@ -361,54 +371,54 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 relative">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 relative transition-colors duration-300">
       {/* --- HEADER --- */}
       {/* Desktop (md+) */}
-      <div className="hidden md:flex h-16 border-b items-center justify-between px-6 bg-white/80 backdrop-blur-md z-20 shadow-sm shrink-0 sticky top-0">
+      <div className="hidden md:flex h-16 border-b border-gray-200 dark:border-slate-700 items-center justify-between px-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 shadow-sm shrink-0 sticky top-0">
         <div className="flex items-center space-x-3">
-          <div className="bg-gradient-to-tr from-indigo-600 to-violet-600 p-2 rounded-xl shadow-lg shadow-indigo-200">
+          <div className="bg-gradient-to-tr from-indigo-600 to-violet-600 p-2 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none">
             <GraduationCap className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-gray-800 text-lg tracking-tight">VIP Tutor</h1>
-            <p className="text-[11px] text-gray-500 font-medium flex items-center gap-1">
+            <h1 className="font-bold text-gray-800 dark:text-gray-100 text-lg tracking-tight">VIP Tutor</h1>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1">
                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online • AI Expert
             </p>
           </div>
         </div>
-        <div className="flex bg-gray-100/80 p-1 rounded-xl shadow-inner border border-gray-200/50">
-          <button onClick={() => setMode(TutorMode.GENERAL)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.GENERAL ? 'bg-white text-indigo-600 shadow-sm scale-100' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'}`}>General</button>
-          <button onClick={() => setMode(TutorMode.EXERCISE)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.EXERCISE ? 'bg-white text-indigo-600 shadow-sm scale-100' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'}`}>Exercises</button>
-          <button onClick={() => setMode(TutorMode.THEORY)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.THEORY ? 'bg-white text-indigo-600 shadow-sm scale-100' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'}`}>Theory</button>
-          <button onClick={() => setMode(TutorMode.GAME)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.GAME ? 'bg-white text-green-600 shadow-sm scale-100' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'}`}>Game</button>
+        <div className="flex bg-gray-100/80 dark:bg-slate-800/80 p-1 rounded-xl shadow-inner border border-gray-200/50 dark:border-slate-700">
+          <button onClick={() => setMode(TutorMode.GENERAL)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.GENERAL ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm scale-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-slate-700/50'}`}>General</button>
+          <button onClick={() => setMode(TutorMode.EXERCISE)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.EXERCISE ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm scale-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-slate-700/50'}`}>Exercises</button>
+          <button onClick={() => setMode(TutorMode.THEORY)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.THEORY ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm scale-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-slate-700/50'}`}>Theory</button>
+          <button onClick={() => setMode(TutorMode.GAME)} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${mode === TutorMode.GAME ? 'bg-white dark:bg-slate-700 text-green-600 dark:text-green-400 shadow-sm scale-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-slate-700/50'}`}>Game</button>
         </div>
       </div>
 
       {/* Mobile Header (Compact) */}
-      <div className="md:hidden h-14 bg-white/90 backdrop-blur-md border-b flex items-center justify-between px-3 relative z-30 shadow-sm">
+      <div className="md:hidden h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b dark:border-slate-800 flex items-center justify-between px-3 relative z-30 shadow-sm">
         <div className="flex items-center gap-2">
-          <button onClick={onToggleSidebar} className="text-gray-600 p-2 active:bg-gray-100 rounded-full transition-colors">
+          <button onClick={onToggleSidebar} className="text-gray-600 dark:text-gray-300 p-2 active:bg-gray-100 dark:active:bg-slate-800 rounded-full transition-colors">
             <Menu className="w-6 h-6" />
           </button>
           <div className="relative">
              <button 
                onClick={() => setShowMobileModes(!showMobileModes)}
-               className="flex items-center gap-1 font-bold text-gray-800 text-lg active:opacity-70 transition-opacity"
+               className="flex items-center gap-1 font-bold text-gray-800 dark:text-white text-lg active:opacity-70 transition-opacity"
              >
-               VIP<span className="text-indigo-600">Tutor</span> <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showMobileModes ? 'rotate-180' : ''}`} />
+               VIP<span className="text-indigo-600 dark:text-indigo-400">Tutor</span> <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showMobileModes ? 'rotate-180' : ''}`} />
              </button>
              {showMobileModes && (
-               <div className="absolute top-full left-0 mt-3 w-60 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-pop-in z-50 origin-top-left">
-                 <button onClick={() => handleModeSelect(TutorMode.GENERAL)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.GENERAL ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-gray-700 hover:bg-gray-50'}`}>
+               <div className="absolute top-full left-0 mt-3 w-60 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 animate-pop-in z-50 origin-top-left">
+                 <button onClick={() => handleModeSelect(TutorMode.GENERAL)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.GENERAL ? 'bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'}`}>
                     <MessageCircle className="w-5 h-5" /> General Chat
                  </button>
-                 <button onClick={() => handleModeSelect(TutorMode.EXERCISE)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.EXERCISE ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-gray-700 hover:bg-gray-50'}`}>
+                 <button onClick={() => handleModeSelect(TutorMode.EXERCISE)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.EXERCISE ? 'bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'}`}>
                     <Sparkles className="w-5 h-5 text-purple-500" /> Solve Exercises
                  </button>
-                 <button onClick={() => handleModeSelect(TutorMode.THEORY)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.THEORY ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-gray-700 hover:bg-gray-50'}`}>
+                 <button onClick={() => handleModeSelect(TutorMode.THEORY)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.THEORY ? 'bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'}`}>
                     <BookOpen className="w-5 h-5 text-blue-500" /> Theory Expert
                  </button>
-                 <button onClick={() => handleModeSelect(TutorMode.GAME)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.GAME ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-gray-700 hover:bg-gray-50'}`}>
+                 <button onClick={() => handleModeSelect(TutorMode.GAME)} className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${mode === TutorMode.GAME ? 'bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'}`}>
                     <Gamepad2 className="w-5 h-5 text-green-500" /> Mini Game
                  </button>
                </div>
@@ -417,23 +427,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
         <button 
           onClick={onOpenProfile}
-          className="p-2 text-indigo-600 bg-indigo-50 rounded-full active:scale-95 transition-transform hover:shadow-md border border-indigo-100"
+          className="p-2 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-slate-800 rounded-full active:scale-95 transition-transform hover:shadow-md border border-indigo-100 dark:border-slate-700"
         >
            <Sparkles className="w-5 h-5" />
         </button>
       </div>
 
       {/* --- CONTENT AREA --- */}
-      <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-5 bg-slate-50 relative scroll-smooth pb-24 md:pb-32">
+      <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-5 bg-slate-50 dark:bg-slate-900 relative scroll-smooth pb-24 md:pb-32">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full animate-fade-in -mt-10 md:mt-0">
              
              {/* Mobile: Minimalist Welcome */}
              <div className="md:hidden flex flex-col items-center w-full">
-                <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mb-6 animate-float shadow-lg shadow-indigo-200/50">
-                    <GraduationCap className="w-10 h-10 text-indigo-600" />
+                <div className="w-20 h-20 bg-indigo-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 animate-float shadow-lg shadow-indigo-200/50 dark:shadow-none">
+                    <GraduationCap className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 text-center">
                    Hôm nay bạn muốn học gì?
                 </h2>
                 {/* Horizontal Scroll Suggestions */}
@@ -442,12 +452,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       <button 
                         key={idx}
                         onClick={() => handleSendMessage(s.text, s.mode as TutorMode)}
-                        className="snap-center shrink-0 w-36 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg transition-all text-center flex flex-col items-center gap-3 active:scale-95"
+                        className="snap-center shrink-0 w-36 p-4 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-lg transition-all text-center flex flex-col items-center gap-3 active:scale-95"
                       >
-                         <div className={`p-3 rounded-full ${s.bg}`}>
-                            <s.icon className={`w-6 h-6 ${s.color}`} />
+                         <div className={`p-3 rounded-full ${s.bg} dark:bg-slate-700`}>
+                            <s.icon className={`w-6 h-6 ${s.color} dark:text-indigo-300`} />
                          </div>
-                         <span className="text-xs font-bold text-gray-700">{s.label}</span>
+                         <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{s.label}</span>
                       </button>
                    ))}
                 </div>
@@ -455,22 +465,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
              
              {/* Desktop: Full Welcome */}
              <div className="hidden md:flex flex-col items-center justify-center text-center mb-8 max-w-lg px-4 mt-4">
-                <div className="inline-flex items-center justify-center p-4 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl mb-6 shadow-xl shadow-indigo-200 animate-float">
+                <div className="inline-flex items-center justify-center p-4 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl mb-6 shadow-xl shadow-indigo-200 dark:shadow-none animate-float">
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-3 tracking-tight">Welcome to VIP Tutor</h2>
-                <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3 tracking-tight">Welcome to VIP Tutor</h2>
+                <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
                    Hệ thống gia sư AI cao cấp. Sẵn sàng giải bài tập, tạo đề thi và luyện tập tiếng Anh chuyên sâu.
                 </p>
              </div>
              <div className="hidden md:grid grid-cols-2 gap-4 w-full max-w-3xl px-4 pb-4">
                 {SUGGESTIONS.map((s, idx) => (
-                  <button key={idx} onClick={() => handleSendMessage(s.text, s.mode as TutorMode)} className="flex flex-col items-start p-5 bg-white border border-gray-100 rounded-2xl hover:border-indigo-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group text-left relative overflow-hidden active:scale-[0.99]">
+                  <button key={idx} onClick={() => handleSendMessage(s.text, s.mode as TutorMode)} className="flex flex-col items-start p-5 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group text-left relative overflow-hidden active:scale-[0.99]">
                      <div className="flex items-center gap-3 w-full mb-3">
-                        <div className={`p-2.5 rounded-xl ${s.bg} group-hover:scale-110 transition-transform`}><s.icon className={`w-5 h-5 ${s.color}`} /></div>
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider group-hover:text-indigo-600 transition-colors">{s.label}</span>
+                        <div className={`p-2.5 rounded-xl ${s.bg} dark:bg-slate-700 group-hover:scale-110 transition-transform`}><s.icon className={`w-5 h-5 ${s.color} dark:text-indigo-300`} /></div>
+                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{s.label}</span>
                      </div>
-                     <p className="text-sm text-gray-700 font-medium pr-6 leading-relaxed line-clamp-2">{s.text}</p>
+                     <p className="text-sm text-gray-700 dark:text-gray-300 font-medium pr-6 leading-relaxed line-clamp-2">{s.text}</p>
                   </button>
                 ))}
              </div>
@@ -482,26 +492,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           const isModel = msg.role === Role.MODEL;
           return (
             <div key={msg.id} className={`flex w-full animate-slide-up ${msg.role === Role.USER ? 'justify-end' : 'justify-start'}`}>
-              <div className={`relative max-w-[88%] md:max-w-[70%] rounded-[1.5rem] shadow-sm border px-1 ${msg.role === Role.USER ? 'bg-gradient-to-br from-[#8b5cf6] to-[#6366f1] text-white border-transparent rounded-br-none shadow-indigo-200' : 'bg-white border-gray-100 text-gray-800 rounded-bl-none shadow-gray-100'}`}>
+              <div className={`relative max-w-[88%] md:max-w-[70%] rounded-[1.5rem] shadow-sm border px-1 ${msg.role === Role.USER ? 'bg-gradient-to-br from-[#8b5cf6] to-[#6366f1] text-white border-transparent rounded-br-none shadow-indigo-200 dark:shadow-none' : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-none shadow-gray-100 dark:shadow-none'}`}>
                 {msg.attachments && msg.attachments.length > 0 && (
                   <div className="p-3 gap-2 flex flex-wrap">
                     {msg.attachments.map((att, idx) => (<div key={idx} className="relative group transition-transform hover:scale-105">{renderAttachmentPreview(att)}</div>))}
                   </div>
                 )}
-                <div className="p-3 md:p-5 overflow-x-auto text-[15px] md:text-[16px] leading-relaxed font-sans">
+                <div className="p-3 md:p-5 overflow-x-auto text-[14px] md:text-[15px] leading-relaxed font-sans">
                   {msg.role === Role.USER ? (<p className="whitespace-pre-wrap break-words">{msg.text}</p>) : (renderMessageContent(msg))}
                 </div>
-                <div className={`px-4 py-2 text-[10px] flex items-center justify-between opacity-70 border-t ${msg.role === Role.USER ? 'border-white/20 text-indigo-50' : 'border-gray-100 text-gray-400'}`}>
+                <div className={`px-4 py-2 text-[10px] flex items-center justify-between opacity-70 border-t ${msg.role === Role.USER ? 'border-white/20 text-indigo-50' : 'border-gray-100 dark:border-slate-700 text-gray-400'}`}>
                   <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   {msg.role === Role.MODEL && !msg.isGameData && (
                      <div className="flex gap-2">
-                        <button onClick={() => navigator.clipboard.writeText(msg.text)} className="flex items-center gap-1 hover:text-indigo-600 transition-colors px-1"><Copy className="w-3 h-3" /> Copy</button>
+                        <button onClick={() => navigator.clipboard.writeText(msg.text)} className="flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors px-1"><Copy className="w-3 h-3" /> Copy</button>
                      </div>
                   )}
                 </div>
                 {isLastMessage && isModel && !msg.isGameData && !isLoading && (
                   <div className="absolute -bottom-10 left-0 animate-pop-in z-20">
-                     <button onClick={handleQuickCreateGame} className="flex items-center gap-2 bg-white border border-green-200 text-green-700 text-xs font-bold py-1.5 px-3 rounded-full shadow-lg hover:bg-green-50 hover:scale-105 transition-all"><Zap className="w-3 h-3 fill-green-500 text-green-500" /> Tạo Game</button>
+                     <button onClick={handleQuickCreateGame} className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-green-200 dark:border-green-900 text-green-700 dark:text-green-400 text-xs font-bold py-1.5 px-3 rounded-full shadow-lg hover:bg-green-50 dark:hover:bg-slate-700 hover:scale-105 transition-all"><Zap className="w-3 h-3 fill-green-500 text-green-500" /> Tạo Game</button>
                   </div>
                 )}
               </div>
@@ -511,11 +521,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         {(isLoading || isProcessingFile) && (
           <div className="flex justify-start w-full animate-fade-in">
-             <div className="bg-white p-4 rounded-[1.5rem] rounded-bl-none shadow-sm border border-gray-100 flex items-center gap-3">
+             <div className="bg-white dark:bg-slate-800 p-4 rounded-[1.5rem] rounded-bl-none shadow-sm border border-gray-100 dark:border-slate-700 flex items-center gap-3">
                   {isProcessingFile ? (
                      <>
                         <ImageIcon className="w-4 h-4 text-pink-500 animate-pulse" />
-                        <span className="text-xs text-gray-600 font-medium animate-pulse">{processingStatus || "Đang xử lý file..."}</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-300 font-medium animate-pulse">{processingStatus || "Đang xử lý file..."}</span>
                      </>
                   ) : (
                     <>
@@ -535,7 +545,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="max-w-4xl mx-auto w-full pointer-events-auto">
            {/* Attachment Previews */}
            {attachments.length > 0 && (
-            <div className="mb-2 mx-2 bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 p-3 flex gap-3 overflow-x-auto animate-slide-up">
+            <div className="mb-2 mx-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 dark:border-slate-700 p-3 flex gap-3 overflow-x-auto animate-slide-up">
                {attachments.map((att, idx) => (
                   <div key={idx} className="relative inline-block group shrink-0 transition-transform hover:scale-105">
                       {renderAttachmentPreview(att)}
@@ -546,13 +556,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           )}
 
           {/* Floating Pill Input Bar */}
-          <div className="flex items-end gap-2 bg-white/90 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 rounded-[2rem] p-2 pr-3 transition-all focus-within:shadow-[0_8px_40px_rgb(99,102,241,0.2)] focus-within:border-indigo-200">
+          <div className="flex items-end gap-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-black/50 border border-white/50 dark:border-slate-700 rounded-[2rem] p-2 pr-3 transition-all focus-within:shadow-[0_8px_40px_rgb(99,102,241,0.2)] focus-within:border-indigo-200 dark:focus-within:border-indigo-800">
              
              {/* Upload Button */}
              <input type="file" multiple accept="image/*,.pdf,.doc,.docx" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
              <button 
                onClick={() => fileInputRef.current?.click()} 
-               className="w-10 h-10 md:w-11 md:h-11 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-all active:scale-95 shrink-0"
+               className="w-10 h-10 md:w-11 md:h-11 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all active:scale-95 shrink-0"
                title="Tải ảnh/file"
              >
                <Plus className="w-5 h-5 md:w-6 md:h-6" />
@@ -566,7 +576,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
                 placeholder={isProcessingFile ? "Đang xử lý file..." : mode === TutorMode.EXERCISE ? "Dán bài tập hoặc tải ảnh..." : "Hỏi tôi bất cứ điều gì..."}
                 disabled={isProcessingFile}
-                className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-3 text-gray-800 text-[15px] md:text-base placeholder-gray-400 min-h-[44px] max-h-32 leading-relaxed"
+                className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-3 text-gray-800 dark:text-white text-[15px] md:text-base placeholder-gray-400 dark:placeholder-gray-500 min-h-[44px] max-h-32 leading-relaxed"
                 rows={1}
              />
 
@@ -574,13 +584,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
              <button 
                onClick={() => handleSendMessage()}
                disabled={(!input.trim() && attachments.length === 0) || isLoading || isProcessingFile}
-               className={`w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center text-white shadow-lg transition-all active:scale-90 shrink-0 mb-0.5 ${(!input.trim() && attachments.length === 0) || isLoading || isProcessingFile ? 'bg-gray-300 shadow-none cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:shadow-indigo-300 hover:scale-105'}`}
+               className={`w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center text-white shadow-lg transition-all active:scale-90 shrink-0 mb-0.5 ${(!input.trim() && attachments.length === 0) || isLoading || isProcessingFile ? 'bg-gray-300 dark:bg-slate-600 shadow-none cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:shadow-indigo-300 hover:scale-105'}`}
              >
                {isLoading || isProcessingFile ? <Loader2 className="w-5 h-5 animate-spin" /> : <ArrowRight className="w-5 h-5 md:w-6 md:h-6 stroke-[3]" />}
              </button>
           </div>
           <div className="text-center mt-2 pb-2">
-             <p className="text-[10px] text-gray-400 font-medium">Hệ thống nén ảnh thông minh - Tiết kiệm 4G/5G</p>
+             <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Hệ thống nén ảnh thông minh - Tiết kiệm 4G/5G</p>
           </div>
         </div>
       </div>

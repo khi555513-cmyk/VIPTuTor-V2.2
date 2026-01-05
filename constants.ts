@@ -1,6 +1,4 @@
-
-
-import { TutorMode, AccountTier } from './types';
+import { TutorMode, AccountTier, DocumentItem } from './types';
 
 // --- CONFIG ---
 export const ZALO_CONSULTATION_URL = 'https://zalo.me/0368132628';
@@ -43,7 +41,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 0,
     tier: 'basic',
     priceVND: 0,
-    features: ['15 tin nhắn/ngày', '1 Game/ngày', 'Lưu bài học']
+    features: ['15 tin nhắn/ngày', '1 Game/ngày', 'Xem kho tài liệu (Hạn chế)']
   },
   // --- PRO PACKAGES ---
   {
@@ -52,7 +50,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 1,
     tier: 'pro',
     priceVND: 49000,
-    features: ['100 tin nhắn/ngày', '5 đề thi/ngày', 'Game không giới hạn']
+    features: ['100 tin nhắn/ngày', '5 đề thi/ngày', 'Tải tài liệu PRO']
   },
   {
     id: 'pack_pro_2m',
@@ -60,7 +58,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 2,
     tier: 'pro',
     priceVND: 89000,
-    features: ['Tiết kiệm 10%', 'Luyện thi cấp tốc', 'Full tính năng PRO']
+    features: ['Tiết kiệm 10%', 'Truy cập kho ôn thi', 'Full tính năng PRO']
   },
   {
     id: 'pack_pro_5m',
@@ -68,7 +66,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 5,
     tier: 'pro',
     priceVND: 199000,
-    features: ['Tiết kiệm 20%', 'Học kỳ tiêu chuẩn', 'Hỗ trợ 24/7'],
+    features: ['Tiết kiệm 20%', 'Mở khóa Test Prep', 'Kho tài liệu ôn thi đầy đủ'],
     isPopular: true
   },
   {
@@ -77,7 +75,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 12,
     tier: 'pro',
     priceVND: 399000,
-    features: ['Siêu tiết kiệm', 'Đồng hành cả năm', 'Cam kết hiệu quả']
+    features: ['Siêu tiết kiệm', 'Đồng hành cả năm', 'Quyền tải không giới hạn']
   },
   // --- VIP PACKAGES ---
   {
@@ -86,7 +84,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 1,
     tier: 'vip',
     priceVND: 99000,
-    features: ['Không giới hạn', 'Mô hình AI Max', 'Ưu tiên xử lý']
+    features: ['Không giới hạn', 'Kho tài liệu Độc quyền', 'Ưu tiên xử lý']
   },
   {
     id: 'pack_vip_5m',
@@ -94,7 +92,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 5,
     tier: 'vip',
     priceVND: 399000,
-    features: ['Huy hiệu VIP', 'Tốc độ cao nhất', 'Quyền lợi đặc biệt']
+    features: ['Huy hiệu VIP', 'Tài liệu VIP chuyên sâu', 'Quyền lợi đặc biệt']
   },
   {
     id: 'pack_vip_1y',
@@ -102,7 +100,7 @@ export const SUBSCRIPTION_PACKAGES: SubscriptionPackage[] = [
     durationMonths: 12,
     tier: 'vip',
     priceVND: 699000,
-    features: ['Thanh toán 1 lần', 'Full quyền năng AI', 'Support 1:1']
+    features: ['Thanh toán 1 lần', 'Sở hữu trọn đời kho tài liệu', 'Support 1:1']
   }
 ];
 
@@ -129,7 +127,6 @@ export const ACTIVATION_CODES: Record<string, { tier: AccountTier, months: numbe
   "O3P4-Q5R6-S7T8": { tier: 'pro', months: 2 }, "X9Y0-Z1A2-B3C4": { tier: 'vip', months: 5 },
   "U9V0-W1X2-Y3Z4": { tier: 'pro', months: 5 }, "D5E6-F7G8-H9I0": { tier: 'vip', months: 1 },
   "A5B6-C7D8-E9F0": { tier: 'pro', months: 12 }, "J1K2-L3M4-N5O6": { tier: 'vip', months: 12 },
-  // "G1H2-I3J4-K5L6": { tier: 'pro', months: 2 }, // Duplicate key skipped
   "P7Q8-R9S0-T1U2": { tier: 'vip', months: 5 },
   "M7N8-O9P0-Q1R2": { tier: 'pro', months: 1 }, "V3W4-X5Y6-Z7A8": { tier: 'vip', months: 1 },
   "S3T4-U5V6-W7X8": { tier: 'pro', months: 5 }, "B9C0-D1E2-F3G4": { tier: 'vip', months: 12 },
@@ -284,7 +281,7 @@ export const ACTIVATION_CODES: Record<string, { tier: AccountTier, months: numbe
   "M5Q9-W2E6-R7T3": { tier: 'pro', months: 5 }, "I3O8-P5L1-Y2U4": { tier: 'vip', months: 1 },
   "C9V1-B4N2-X6Z8": { tier: 'pro', months: 2 }, "D7F5-G9H3-S1A2": { tier: 'vip', months: 5 },
   "H2G7-F5D9-K1J3": { tier: 'pro', months: 12 }, "C4V6-B2N9-X8Z1": { tier: 'vip', months: 1 },
-  "T5Y1-U8I2-O3P9": { tier: 'pro', months: 1 }, /* "H9G3-F1D7-K2J5": { tier: 'vip', months: 12 }, */
+  "T5Y1-U8I2-O3P9": { tier: 'pro', months: 1 },
   "X6C2-V7B5-Q1W9": { tier: 'pro', months: 5 }, "T2Y6-U4I1-O8P3": { tier: 'vip', months: 5 },
   "R8E3-T1Y9-U2I7": { tier: 'pro', months: 2 }, "J5K1-L8N3-H9G2": { tier: 'vip', months: 1 },
   "P2L5-Y4U6-I8O1": { tier: 'pro', months: 12 }, "X1C3-V9B6-Q5W2": { tier: 'vip', months: 12 },
@@ -300,7 +297,7 @@ export const ACTIVATION_CODES: Record<string, { tier: AccountTier, months: numbe
   "S2A9-D6F3-G1H8": { tier: 'pro', months: 12 }, "T3Y5-U1I9-O7P2": { tier: 'vip', months: 5 },
   "K7J2-H1G5-F8D9": { tier: 'pro', months: 1 }, "J6L2-K3N8-H5G1": { tier: 'vip', months: 1 },
   "T4Y6-U9I2-O5P1": { tier: 'pro', months: 2 }, "X5C2-V1B9-Q7W4": { tier: 'vip', months: 12 },
-  "L6K1-J3H7-O2P9": { tier: 'pro', months: 12 }, /* "R9E6-T8Y1-U5I3": { tier: 'vip', months: 5 }, */
+  "L6K1-J3H7-O2P9": { tier: 'pro', months: 12 }, "R9E6-T8Y1-U5I3": { tier: 'vip', months: 5 },
   "R3E7-T5Y8-U9I4": { tier: 'pro', months: 5 }, "P1L3-Y7U2-I8O5": { tier: 'vip', months: 1 },
   "O9P5-L2K1-J8H3": { tier: 'pro', months: 2 }, "S8A2-D4F6-G9H1": { tier: 'vip', months: 12 },
   "F2D9-G6H5-J1K7": { tier: 'pro', months: 1 }, "R4E6-T8Y2-U1I3": { tier: 'vip', months: 5 },
@@ -389,33 +386,43 @@ export const ACTIVATION_CODES: Record<string, { tier: AccountTier, months: numbe
   "H2G7-F6D1-K9J5": { tier: 'pro', months: 12 }, "H1J7-K5L3-M8N6": { tier: 'vip', months: 5 },
   "T8Y2-U9I4-O1P5": { tier: 'pro', months: 1 }, "T7Y3-U2I6-O9P5": { tier: 'vip', months: 1 },
   "J9K4-L2N3-H6G8": { tier: 'pro', months: 2 }, "X1C5-V7B2-Q9W4": { tier: 'vip', months: 12 },
-  "X6C5-V3B9-Q7W1": { tier: 'pro', months: 12 }, "R8E2-T5Y1-U6I7": { tier: 'vip', months: 1 },
-  /* "R5E1-T6Y8-U2I4": { tier: 'pro', months: 5 }, */ "O7P1-L3K5-J9H2": { tier: 'vip', months: 5 },
+  "X6C5-V3B9-Q7W1": { tier: 'vip', months: 12 }, "R8E2-T5Y1-U6I7": { tier: 'vip', months: 1 },
+  "O7P1-L3K5-J9H2": { tier: 'vip', months: 5 },
   "P3L1-Y7U2-I8O5": { tier: 'pro', months: 1 }, "F5D9-G2H8-J6K3": { tier: 'vip', months: 12 },
   "S6A2-D4F6-G9H3": { tier: 'pro', months: 2 }, "M9Q4-W3E5-R2T1": { tier: 'vip', months: 1 },
   "R1E9-T8Y2-U5I7": { tier: 'pro', months: 5 }, "Y8U2-I7O4-P6L1": { tier: 'vip', months: 5 },
   "O7P2-L5K3-J4H1": { tier: 'pro', months: 12 }, "B7N3-V9C6-X2Z8": { tier: 'vip', months: 12 },
-  /* "G6H9-J3K2-F1D5": { tier: 'pro', months: 2 }, */ "S6A2-D8F3-G5H9": { tier: 'vip', months: 1 },
+  "S6A2-D8F3-G5H9": { tier: 'vip', months: 1 },
   "U3I1-O8P4-L2K9": { tier: 'pro', months: 1 }, "K7J2-H9G1-F5D4": { tier: 'vip', months: 12 },
   "M5Q7-W3E8-R2T1": { tier: 'pro', months: 5 }, "E4R5-T8Y2-U1I6": { tier: 'vip', months: 5 },
   "I3O7-P5L1-Y9U8": { tier: 'pro', months: 12 }, "L5K3-J9H1-O2P7": { tier: 'vip', months: 1 },
-  /* "H9J3-K2L6-M5N1": { tier: 'pro', months: 2 }, */ "Q7W6-E3R8-T5Y9": { tier: 'vip', months: 12 },
+  "Q7W6-E3R8-T5Y9": { tier: 'vip', months: 12 },
   "C3V1-B6N9-X5Z4": { tier: 'pro', months: 1 }, "U8I2-O6P1-L4K7": { tier: 'vip', months: 1 },
   "T2Y5-U8I6-O9P1": { tier: 'pro', months: 5 }, "G5H9-J1K8-F2D3": { tier: 'vip', months: 5 },
   "H7G1-F8D2-K4J5": { tier: 'pro', months: 12 }, "M1Q2-W7E3-R9T6": { tier: 'vip', months: 12 },
   "J4K2-L7N9-H6G8": { tier: 'pro', months: 1 }, "C8V1-B5N7-X6Z2": { tier: 'vip', months: 1 },
   "X6C2-V7B3-Q9W5": { tier: 'pro', months: 2 }, "D6F9-G5H2-S3A1": { tier: 'vip', months: 12 },
-  "R1E4-T8Y5-U3I7": { tier: 'pro', months: 5 }, /* "H9G3-F1D7-K2J5": { tier: 'vip', months: 5 }, */
+  "R1E4-T8Y5-U3I7": { tier: 'pro', months: 5 }, 
   "O7P1-L6K3-J2H9": { tier: 'pro', months: 12 }, "T6Y5-U3I9-O2P1": { tier: 'vip', months: 1 },
   "F4D2-G9H1-J6K5": { tier: 'pro', months: 2 }, "J2K4-L7N3-H5G9": { tier: 'vip', months: 12 },
   "M1Q9-W7E3-R2T4": { tier: 'pro', months: 5 }, "X7C8-V2B5-Q1W9": { tier: 'vip', months: 1 },
-  /* "Y6U1-I3O9-P5L2": { tier: 'pro', months: 1 }, */ "R9E6-T8Y1-U5I3": { tier: 'vip', months: 5 },
-  /* "B9N4-V2C1-X7Z8": { tier: 'pro', months: 12 }, */ "P1L5-Y7U6-I9O2": { tier: 'vip', months: 12 },
+  "P1L5-Y7U6-I9O2": { tier: 'vip', months: 12 },
   "S3A7-D5F1-G6H2": { tier: 'pro', months: 2 }, "S4A8-D3F2-G1H6": { tier: 'vip', months: 1 },
   "K5J3-H8G4-F1D6": { tier: 'pro', months: 1 }, "R8T3-Y5U2-I1O7": { tier: 'vip', months: 12 },
   "E7R1-T5Y2-U9I6": { tier: 'pro', months: 5 }, "N5B9-V3C8-X2Z6": { tier: 'vip', months: 5 },
   "L2K7-J6H9-O4P1": { tier: 'pro', months: 12 }, "K4J1-H8G5-F2D7": { tier: 'vip', months: 1 }
 };
+
+// --- DOCUMENT LIBRARY DATA (ADMIN PROVIDED) ---
+export const DOCUMENT_LIBRARY: DocumentItem[] = [
+  { id: 'doc_1', title: 'Đề thi THPT Quốc Gia 2023 - Mã đề 401', category: 'THPT', description: 'Đề thi chính thức môn Tiếng Anh kỳ thi tốt nghiệp THPT 2023.', downloadUrl: '#', dateAdded: '2023-07-10', fileType: 'PDF' },
+  { id: 'doc_2', title: '1000 Từ vựng IELTS Common', category: 'IELTS', description: 'Danh sách từ vựng phổ biến nhất trong IELTS Reading & Listening.', downloadUrl: '#', dateAdded: '2023-08-15', fileType: 'PDF', isVipOnly: true },
+  { id: 'doc_3', title: 'Đề cương ôn tập Tiếng Anh 9 lên 10', category: 'THCS', description: 'Tổng hợp ngữ pháp trọng tâm thi vào 10 chuyên Anh.', downloadUrl: '#', dateAdded: '2023-05-20', fileType: 'DOCX' },
+  { id: 'doc_4', title: 'Giải chi tiết Đề thi THPT QG 2022', category: 'THPT', description: 'Phân tích chi tiết đáp án và từ vựng.', downloadUrl: '#', dateAdded: '2022-08-01', fileType: 'PDF' },
+  { id: 'doc_5', title: 'IELTS Writing Task 2 Samples (Band 9.0)', category: 'IELTS', description: 'Các bài mẫu Writing đạt điểm tuyệt đối.', downloadUrl: '#', dateAdded: '2023-09-05', fileType: 'PDF', isVipOnly: true },
+  { id: 'doc_6', title: 'Bộ đề thi thử THPT QG 2024 - Trường Chuyên', category: 'THPT', description: 'Đề thi thử từ các trường chuyên nổi tiếng.', downloadUrl: '#', dateAdded: '2024-03-10', fileType: 'PDF', isVipOnly: true },
+  { id: 'doc_7', title: 'Ngữ pháp tiếng Anh cơ bản cho người mất gốc', category: 'KHAC', description: 'Tài liệu nhập môn dễ hiểu.', downloadUrl: '#', dateAdded: '2023-01-10', fileType: 'PDF' },
+];
 
 // --- PROMPTS ---
 

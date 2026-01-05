@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class', // QUAN TRỌNG: Kích hoạt dark mode bằng class 'dark'
         theme: {
           extend: {
             fontFamily: {
@@ -21,6 +23,7 @@
               'float': 'float 3s ease-in-out infinite',
               'shimmer': 'shimmer 2.5s infinite linear',
               'progress': 'progress-indeterminate 1.5s infinite ease-in-out',
+              'bounce-slow': 'bounce 2s infinite',
             },
             keyframes: {
               fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -49,38 +52,87 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <style>
+      :root {
+        font-size: 15px; /* Giảm base font size một chút */
+      }
       body {
         font-family: 'Inter', sans-serif;
         touch-action: pan-x pan-y;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         overscroll-behavior-y: none; /* Prevent pull-to-refresh on mobile */
+        transition: background-color 0.3s ease, color 0.3s ease; /* Smooth Theme Switch */
       }
       
+      /* Global Button Morph Effect */
+      button, a, .clickable {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      button:active:not(:disabled) {
+        transform: scale(0.95);
+      }
+
       /* Scrollbar Styling */
-      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar { width: 5px; height: 5px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; transition: background 0.2s; }
       ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+      .dark ::-webkit-scrollbar-thumb { background: #475569; }
+      .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
       
       /* Typography for Markdown Content */
-      .prose-vip { color: #334155; line-height: 1.75; font-size: 0.95rem; }
+      .prose-vip { color: #334155; line-height: 1.7; font-size: 0.9rem; }
+      .dark .prose-vip { color: #cbd5e1; }
+      
       .prose-vip h1, .prose-vip h2, .prose-vip h3 { color: #0f172a; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.75em; line-height: 1.3; }
-      .prose-vip h1 { font-size: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; }
-      .prose-vip h2 { font-size: 1.25rem; }
+      .dark .prose-vip h1, .dark .prose-vip h2, .dark .prose-vip h3 { color: #f1f5f9; }
+      
+      .prose-vip h1 { font-size: 1.35rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; }
+      .dark .prose-vip h1 { border-color: #334155; }
+      
+      .prose-vip h2 { font-size: 1.15rem; }
       .prose-vip p { margin-bottom: 1em; text-align: justify; }
       .prose-vip ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
       .prose-vip ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em; }
       .prose-vip li { margin-bottom: 0.5em; }
       .prose-vip strong { color: #0f172a; font-weight: 700; }
+      .dark .prose-vip strong { color: #f8fafc; }
+      
       .prose-vip code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background-color: #f1f5f9; color: #db2777; padding: 0.2em 0.4em; border-radius: 0.375rem; }
+      .dark .prose-vip code { background-color: #1e293b; color: #f472b6; }
+      
       .prose-vip pre { background-color: #1e293b; color: #e2e8f0; padding: 1em; border-radius: 0.75rem; overflow-x: auto; margin: 1.5em 0; }
       .prose-vip pre code { background-color: transparent; color: inherit; padding: 0; }
+      
       .prose-vip blockquote { border-left: 4px solid #6366f1; padding-left: 1em; margin: 1.5em 0; color: #475569; font-style: italic; background: #f8fafc; padding: 1rem; border-radius: 0 0.5rem 0.5rem 0; }
-      .prose-vip table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.9rem; }
+      .dark .prose-vip blockquote { background: #1e293b; color: #94a3b8; }
+      
+      .prose-vip table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.85rem; }
       .prose-vip th { background-color: #f1f5f9; font-weight: 600; text-align: left; padding: 0.75rem; border-bottom: 2px solid #cbd5e1; }
+      .dark .prose-vip th { background-color: #1e293b; border-color: #475569; color: #e2e8f0; }
+      
       .prose-vip td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+      .dark .prose-vip td { border-color: #334155; }
+      
       .prose-vip tr:nth-child(even) { background-color: #fafafa; }
+      .dark .prose-vip tr:nth-child(even) { background-color: #0f172a; }
+
+      /* Zalo Bubble Animation */
+      @keyframes pulse-ring {
+        0% { transform: scale(0.33); }
+        80%, 100% { opacity: 0; }
+      }
+      .zalo-ring::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        background-color: #2563eb;
+        border-radius: 50%;
+        z-index: -1;
+        opacity: 0.6;
+        animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      }
     </style>
   <script type="importmap">
 {
@@ -100,7 +152,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-50 text-slate-900 h-[100dvh] overflow-hidden selection:bg-indigo-100 selection:text-indigo-700">
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 h-[100dvh] overflow-hidden selection:bg-indigo-100 selection:text-indigo-700 dark:selection:bg-indigo-900 dark:selection:text-indigo-100">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

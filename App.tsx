@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
@@ -11,6 +13,7 @@ import UserProfileView from './components/UserProfile';
 import SubscriptionExpiredModal from './components/SubscriptionExpiredModal';
 import LimitReachedModal from './components/LimitReachedModal';
 import ApiKeyModal from './components/ApiKeyModal';
+import DocumentLibrary from './components/DocumentLibrary';
 import { ChatSession, SavedKnowledgeItem, Message, Role, AppNotification, GameData, UserProfile, DailyUsage } from './types';
 import { TIER_LIMITS } from './constants';
 import { Menu } from 'lucide-react';
@@ -117,11 +120,16 @@ const App: React.FC = () => {
     }
   });
 
-  const [currentView, setCurrentView] = useState<'chat' | 'saved' | 'notifications' | 'test-prep' | 'profile'>('chat');
+  const [currentView, setCurrentView] = useState<'chat' | 'saved' | 'notifications' | 'test-prep' | 'profile' | 'library'>('chat');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [fullScreenGameData, setFullScreenGameData] = useState<GameData | null>(null);
+
+  // Theme State
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('vip_tutor_theme') as 'light' | 'dark') || 'light';
+  });
 
   // Expiry Modal State
   const [showExpiryModal, setShowExpiryModal] = useState(false);
@@ -152,6 +160,57 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!isResettingRef.current) localStorage.setItem('vip_tutor_usage', JSON.stringify(dailyUsage));
   }, [dailyUsage]);
+
+  useEffect(() => {
+    localStorage.setItem('vip_tutor_theme', theme);
+    // Apply theme to document
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  // --- NEW FEATURE NOTIFICATION CHECK ---
+  useEffect(() => {
+    const hasSeenUpdate = localStorage.getItem('has_seen_update_v2_1'); // Version bump key
+    if (!hasSeenUpdate) {
+      // 1. Add notification
+      const updateNotification: AppNotification = {
+        id: Date.now().toString(),
+        title: 'Cập nhật Tính năng Mới! 🎉',
+        message: 'Ứng dụng vừa được nâng cấp: Chế độ Tối/Sáng, Đồng hồ hiển thị thời gian và Kho Tài Liệu Ôn Thi mới! Khám phá ngay.',
+        type: 'tip',
+        timestamp: Date.now(),
+        isRead: false
+      };
+      setNotifications(prev => [updateNotification, ...prev]);
+      
+      // 2. Play Sound
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5 (Ding)
+        oscillator.frequency.exponentialRampToValueAtTime(440, audioContext.currentTime + 0.5);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
+      } catch (e) {
+        console.warn("Audio playback failed or blocked");
+      }
+
+      localStorage.setItem('has_seen_update_v2_1', 'true');
+    }
+  }, []);
 
   // --- HANDLER: Add Notification ---
   const handleAddNotification = (note: AppNotification) => {
@@ -371,6 +430,18 @@ const App: React.FC = () => {
       );
     }
 
+    if (currentView === 'library') {
+      return (
+        <DocumentLibrary 
+          userTier={userProfile.accountTier}
+          onUpgradeRequired={() => {
+            setLimitModalMessage("Tài liệu này chỉ dành cho tài khoản VIP. Hãy nâng cấp ngay để tải về!");
+            setIsLimitModalOpen(true);
+          }}
+        />
+      );
+    }
+
     if (currentView === 'chat') {
        return (
          <ChatInterface 
@@ -401,7 +472,17 @@ const App: React.FC = () => {
     }
     
     if (currentView === 'notifications') {
-      return <NotificationView notifications={notifications} onMarkAllRead={handleMarkAllNotificationsRead} onDelete={handleDeleteNotification} onMarkRead={handleMarkNotificationRead} />;
+      return (
+        <NotificationView 
+          notifications={notifications} 
+          onMarkAllRead={handleMarkAllNotificationsRead} 
+          onDelete={handleDeleteNotification} 
+          onMarkRead={handleMarkNotificationRead}
+          onPlayGameFromNotification={(data) => {
+             setFullScreenGameData(data);
+          }}
+        />
+      );
     }
 
     if (currentView === 'profile') {
@@ -422,7 +503,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-[100dvh] bg-gray-100 overflow-hidden relative">
+    <div className={`flex h-[100dvh] bg-gray-100 dark:bg-slate-900 overflow-hidden relative transition-colors duration-300 ${theme}`}>
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       
       <SubscriptionExpiredModal 
@@ -446,7 +527,7 @@ const App: React.FC = () => {
       />
 
       {fullScreenGameData && (
-        <div className="fixed inset-0 z-50 bg-gray-100 animate-fade-in flex flex-col">
+        <div className="fixed inset-0 z-50 bg-gray-100 dark:bg-slate-900 animate-fade-in flex flex-col">
           <MiniGame 
              data={fullScreenGameData} 
              isFullScreenMode={true} 
@@ -473,15 +554,17 @@ const App: React.FC = () => {
           unreadNotificationsCount={unreadCount}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          theme={theme}
+          toggleTheme={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
         />
       </div>
 
       <div className="flex-1 flex flex-col h-full w-full min-w-0">
         {/* Only show default mobile header if NOT in chat view */}
         {currentView !== 'chat' && (
-          <div className="md:hidden h-14 bg-white border-b flex items-center px-4 justify-between flex-shrink-0">
-             <span className="font-bold text-gray-800">VIP Tutor</span>
-             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-600">
+          <div className="md:hidden h-14 bg-white dark:bg-slate-900 border-b dark:border-slate-800 flex items-center px-4 justify-between flex-shrink-0">
+             <span className="font-bold text-gray-800 dark:text-white">VIP Tutor</span>
+             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-600 dark:text-gray-300">
                <Menu className="w-6 h-6" />
              </button>
           </div>

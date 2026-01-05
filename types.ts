@@ -1,4 +1,6 @@
 
+
+
 export enum Role {
   USER = 'user',
   MODEL = 'model',
@@ -109,6 +111,7 @@ export interface AppNotification {
   type: NotificationType;
   timestamp: number;
   isRead: boolean;
+  gameData?: GameData; // Optional: for "Play Later" functionality
 }
 
 // User Profile
@@ -160,4 +163,16 @@ export interface StudentSyncPayload {
   status: 'online' | 'idle' | 'locked';
   currentActivity?: string; // e.g., "Doing Exam", "Chatting"
   lastActive: number;
+}
+
+// --- DOCUMENT LIBRARY TYPES ---
+export interface DocumentItem {
+  id: string;
+  title: string;
+  category: 'THCS' | 'THPT' | 'IELTS' | 'KHAC';
+  description: string;
+  downloadUrl: string;
+  dateAdded: string;
+  fileType: 'PDF' | 'DOCX';
+  isVipOnly?: boolean;
 }

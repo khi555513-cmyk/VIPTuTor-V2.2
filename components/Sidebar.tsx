@@ -1,7 +1,10 @@
 
+
+
 import React from 'react';
-import { MessageSquare, Book, Clock, Plus, Trash2, HelpCircle, Bell, PenTool, ChevronLeft, ChevronRight, GraduationCap, Settings, Shield } from 'lucide-react';
+import { MessageSquare, Book, Clock, Plus, Trash2, HelpCircle, Bell, PenTool, ChevronLeft, ChevronRight, GraduationCap, Settings, FolderOpen, Sun, Moon } from 'lucide-react';
 import { SavedKnowledgeItem, ChatSession } from '../types';
+import RealTimeClock from './RealTimeClock';
 
 interface SidebarProps {
   sessions: ChatSession[];
@@ -10,12 +13,14 @@ interface SidebarProps {
   onSelectSession: (id: string) => void;
   onDeleteSession: (id: string) => void;
   savedItems: SavedKnowledgeItem[];
-  currentView: 'chat' | 'saved' | 'notifications' | 'test-prep' | 'profile';
-  setCurrentView: (view: 'chat' | 'saved' | 'notifications' | 'test-prep' | 'profile') => void;
+  currentView: 'chat' | 'saved' | 'notifications' | 'test-prep' | 'profile' | 'library';
+  setCurrentView: (view: 'chat' | 'saved' | 'notifications' | 'test-prep' | 'profile' | 'library') => void;
   onOpenHelp: () => void;
   unreadNotificationsCount: number;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -30,7 +35,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   onOpenHelp,
   unreadNotificationsCount,
   isCollapsed,
-  onToggleCollapse
+  onToggleCollapse,
+  theme,
+  toggleTheme
 }) => {
 
   const NavButton = ({ 
@@ -126,6 +133,12 @@ const Sidebar: React.FC<SidebarProps> = ({
              label="Test Prep System"
            />
            <NavButton 
+             active={currentView === 'library'} 
+             onClick={() => setCurrentView('library')} 
+             icon={FolderOpen} 
+             label="Kho Tài Liệu"
+           />
+           <NavButton 
              active={currentView === 'saved'} 
              onClick={() => setCurrentView('saved')} 
              icon={Book} 
@@ -186,6 +199,17 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Footer / Toggle */}
       <div className="p-3 border-t border-slate-800 space-y-2">
+        <div className={`flex items-center justify-between px-2 py-1 ${isCollapsed ? 'flex-col gap-2' : ''}`}>
+           <RealTimeClock />
+           <button 
+             onClick={toggleTheme}
+             title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+             className="p-1.5 text-slate-400 hover:text-yellow-400 transition-colors"
+           >
+             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+           </button>
+        </div>
+
         <NavButton 
            active={currentView === 'profile'} 
            onClick={() => setCurrentView('profile')} 
