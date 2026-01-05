@@ -24,15 +24,15 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ onSuccess }) => {
     setIsValidating(true);
     setError('');
 
-    const isValid = await validateApiKey(key);
+    const result = await validateApiKey(key);
 
-    if (isValid) {
+    if (result.valid) {
       localStorage.setItem('gemini_api_key', key);
       setIsValidating(false);
       onSuccess();
     } else {
       setIsValidating(false);
-      setError("API Key không hợp lệ hoặc đã hết hạn mức. Vui lòng kiểm tra lại.");
+      setError(result.error || "API Key không hợp lệ. Vui lòng kiểm tra lại.");
     }
   };
 
@@ -68,7 +68,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ onSuccess }) => {
               {error && (
                 <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex items-start gap-2 text-sm text-red-600 animate-slide-up">
                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                   <span>{error}</span>
+                   <span className="break-words">{error}</span>
                 </div>
               )}
 

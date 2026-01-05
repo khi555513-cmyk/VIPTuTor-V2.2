@@ -21,9 +21,10 @@ const App: React.FC = () => {
   const isResettingRef = useRef(false);
 
   // --- API Key State ---
-  const [hasApiKey, setHasApiKey] = useState<boolean>(false);
+  // Initialize directly from getApiKey to avoid modal flash since we now have a default key
+  const [hasApiKey, setHasApiKey] = useState<boolean>(!!getApiKey());
 
-  // Check key on mount (and only on mount)
+  // Check key on mount (safety check)
   useEffect(() => {
     const key = getApiKey();
     if (key) {

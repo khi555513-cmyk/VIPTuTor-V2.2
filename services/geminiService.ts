@@ -3,8 +3,9 @@ import { GoogleGenAI } from "@google/genai";
 import { Attachment, TutorMode } from '../types';
 import { getSystemInstruction } from '../constants';
 
-// Removed broken default key to force user input for stability
 const STORAGE_KEY = 'gemini_api_key';
+// Key mặc định được cung cấp bởi người dùng
+const DEFAULT_API_KEY = 'AIzaSyDn3DH2UDFcf-vVMYez3G2E6czCjI8o_Mk';
 
 // Helper to safely retrieve API Key
 export const getApiKey = (): string | undefined => {
@@ -32,7 +33,8 @@ export const getApiKey = (): string | undefined => {
     // Ignore ReferenceError
   }
   
-  return undefined;
+  // 4. Return the hardcoded default key
+  return DEFAULT_API_KEY;
 };
 
 // Clear API Key
@@ -43,18 +45,24 @@ export const clearApiKey = () => {
 };
 
 // Validate Key
-export const validateApiKey = async (key: string): Promise<boolean> => {
+export const validateApiKey = async (key: string): Promise<{valid: boolean, error?: string}> => {
   try {
     const ai = new GoogleGenAI({ apiKey: key });
-    // Attempt a minimal generation to test the key
+    // Use gemini-1.5-flash for validation as it is the most stable/available model for connection checks
     await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: { parts: [{ text: "hi" }] },
+      model: 'gemini-1.5-flash', 
+      contents: { parts: [{ text: "ping" }] },
     });
-    return true;
-  } catch (error) {
+    return { valid: true };
+  } catch (error: any) {
     console.error("API Key Validation Failed:", error);
-    return false;
+    let msg = "Kết nối thất bại.";
+    if (error.message) {
+        if (error.message.includes('API_KEY_INVALID')) msg = "API Key không hợp lệ.";
+        else if (error.message.includes('403')) msg = "API Key không có quyền truy cập hoặc hết hạn mức.";
+        else msg = error.message;
+    }
+    return { valid: false, error: msg };
   }
 };
 
@@ -117,46 +125,50 @@ export const generateTutorResponse = async (
 
     const systemInstruction = getSystemInstruction(mode);
 
-    // Primary model attempt: Gemini 2.0 Flash (Stable & Fast)
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
-        contents: {
-          parts: parts
-        },
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.7, 
+    // --- MODEL SELECTION STRATEGY ---
+    // 1. Primary: Gemini 3 Flash Preview (As per latest coding guidelines)
+    // 2. Secondary: Gemini 2.0 Flash Exp (Recent powerful model)
+    // 3. Fallback: Gemini 1.5 Pro (Reliable stable model)
+    
+    const modelsToTry = [
+        'gemini-3-flash-preview', 
+        'gemini-2.0-flash-exp', 
+        'gemini-1.5-pro'
+    ];
+
+    let lastError;
+
+    for (const model of modelsToTry) {
+        try {
+            const response = await ai.models.generateContent({
+                model: model,
+                contents: { parts: parts },
+                config: {
+                    systemInstruction: systemInstruction,
+                    temperature: 0.7, 
+                }
+            });
+            return response.text || "Xin lỗi, tôi không thể tạo câu trả lời vào lúc này.";
+        } catch (error) {
+            console.warn(`Model ${model} failed. Trying next...`, error);
+            lastError = error;
+            // Continue to next model
         }
-      });
-      return response.text || "Xin lỗi, tôi không thể tạo câu trả lời vào lúc này.";
-    } catch (primaryError) {
-      console.warn("Gemini 2.0 Flash failed. Attempting fallback to Pro/Lite.", primaryError);
-      
-      // Fallback model: Gemini 1.5 Pro (Better reasoning if 2.0 fails)
-      const response = await ai.models.generateContent({
-        model: 'gemini-1.5-pro',
-        contents: {
-          parts: parts
-        },
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.7, 
-        }
-      });
-      return response.text || "Xin lỗi, tôi không thể tạo câu trả lời vào lúc này.";
     }
+
+    // If all models fail, throw the last error
+    throw lastError;
 
   } catch (error) {
     console.error("Gemini API Error:", error);
     // @ts-ignore
     const msg = error?.message || '';
     
-    if (msg.includes('API_KEY_INVALID') || msg.includes('API Key not found')) {
+    if (msg.includes('API_KEY_INVALID') || msg.includes('API Key not found') || msg.includes('400')) {
         clearApiKey(); // Clear invalid key to force re-entry
-        return `🚫 **API Key Không Hợp Lệ**\n\nKey hiện tại đã bị từ chối. Vui lòng tải lại trang và nhập Key mới.`;
+        return `🚫 **API Key Không Hợp Lệ**\n\nKey hiện tại đã bị từ chối hoặc không có quyền truy cập model. Vui lòng tải lại trang và nhập Key mới.`;
     }
 
-    return `**Lỗi kết nối với Gia sư AI:**\n\n${msg}\n\nVui lòng kiểm tra kết nối mạng.`;
+    return `**Lỗi kết nối với Gia sư AI:**\n\n${msg}\n\nVui lòng kiểm tra kết nối mạng hoặc thử lại sau.`;
   }
 };
