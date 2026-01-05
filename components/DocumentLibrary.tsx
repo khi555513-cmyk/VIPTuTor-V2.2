@@ -2,8 +2,11 @@
 import React, { useState } from 'react';
 import { DOCUMENT_LIBRARY, ZALO_CONSULTATION_URL } from '../constants';
 import { DocumentItem, AccountTier } from '../types';
-import { FileText, Download, Lock, Search, Filter, FolderOpen, Crown, Eye, Heart, MessageCircle, X } from 'lucide-react';
+import { FileText, Download, Lock, Search, Filter, FolderOpen, Crown, Eye, Heart, MessageCircle, X, AlertCircle } from 'lucide-react';
 import MarkdownRenderer from './MarkdownRenderer';
+
+// Base64 for a simple valid PDF to prevent "Refused to connect" errors in iframe
+const SAMPLE_PDF_URI = "data:application/pdf;base64,JVBERi0xLjcKCjEgMCBvYmogICUgZW50cnkgcG9pbnQKPDwKICAvVHlwZSAvQ2F0YWxvZwogIC9QYWdlcyAyIDAgUgo+PgplbmRvYmoKCjIgMCBvYmoKPDwKICAvVHlwZSAvUGFnZXMKICAvTWVkaWFCb3ggWyAwIDAgNTk1LjI4IDg0MS44OSBdCiAgL0NvdW50IDEKICAvS2lkcyBbIDMgMCBVIF0KPj4KZW5kb2JqCgozIDAgb2JqCjw8CiAgL1R5cGUgL1BhZ2UKICAvUGFyZW50IDIgMCBSCiAgL1Jlc291cmNlcyA8PAogICAgL0ZvbnQgPDwKICAgICAgL0YxIDQgMCBSCgogICAgPj4KICA+PgogIC9Db250ZW50cyA1IDAgUgo+PgplbmRvYmoKCjQgMCBvYmoKPDwKICAvVHlwZSAvRm9udAogIC9TdWJ0eXBlIC9UeXBlMQogIC9CYXNlRm9udCAvSGVsdmV0aWNhCj4+CmVuZG9iagoKNSAwIG9iago8PAogIC9MZW5ndGggMjIzCj4+CnN0cmVhbQpCVAovRjEgMjQgVGYKMTAwIDcwMCBUZAooVklQIFR1dG9yIFBybyAtIERvY3VtZW50IFByZXZpZXcpIFRqCi9GMSAxMiBUZgoxMDAgNjUwIFRkCihUaGlzIGlzIGEgcGxhY2Vob2xkZXIgcHJldmlldyBmb3IgZGVtb25zdHJhdGlvbi4pIFRqCjEwMCA2MzAgVGQKKFRoZSBmdWxsIGRvY3VtZW50IGNvbnRlbnQgaXMgYXZhaWxhYmxlIHZpYSBEb3dubG9hZC4pIFRqCjEwMCA2MDAgVGQKKFBsZWFzZSBjbGljayB0aGUgRG93bmxvYWQgYnV0dG9uIHRvIGdldCB0aGUgY29tcGxldGUgZmlsZS4pIFRqCkVUCmVuZHN0cmVhbQplbmRvYmoKCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxMCAwMDAwMCBuIAowMDAwMDAwMDYwIDAwMDAwIG4gCjAwMDAwMDAxNTcgMDAwMDAgbiAKMDAwMDAwMDI2NCAwMDAwMCBuIAowMDAwMDAwMzUyIDAwMDAwIG4gCnRyYWlsZXIKPDwKICAvU2l6ZSA2CiAgL1Jvb3QgMSAwIFIKPj4Kc3RhcnR4cmVmCjYyNQolJUVPRgo=";
 
 interface DocumentLibraryProps {
   userTier: AccountTier;
@@ -27,8 +30,24 @@ const DocumentLibrary: React.FC<DocumentLibraryProps> = ({ userTier, onUpgradeRe
       onUpgradeRequired();
       return;
     }
-    // Simulate download
-    alert(`Đang tải xuống: ${doc.title}\n(Link dummy trong demo)`);
+    
+    // Real download logic for content present in the app
+    if (doc.content) {
+        const blob = new Blob([doc.content], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        // Download as .md for text content, or .pdf if we had a real blob
+        link.download = `${doc.title}.md`; 
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    } else if (doc.downloadUrl && doc.downloadUrl !== '#') {
+        window.open(doc.downloadUrl, '_blank');
+    } else {
+        alert(`Không thể tải xuống: ${doc.title}\n(File gốc không tồn tại trong bản demo)`);
+    }
   };
 
   const handlePreview = (doc: DocumentItem) => {
@@ -199,21 +218,28 @@ const DocumentLibrary: React.FC<DocumentLibraryProps> = ({ userTier, onUpgradeRe
 
               <div className="flex-1 bg-gray-200 dark:bg-black/50 p-0 overflow-hidden relative">
                  {/* 
-                    PRIORITY: Native PDF Viewer 
-                    Req: "Mở trực tiếp file dưới định dạng pdf" (Open direct file in pdf format)
-                    Req: "Không được tự ý scan văn bản" (Do not scan text) -> Do not use MarkdownRenderer for PDFs
+                    PRIORITY: Native PDF Viewer (Iframe)
+                    We use a valid base64 PDF to ensure the viewer loads correctly (no "Refused to connect").
+                    If a real downloadUrl exists, use it. Otherwise use the SAMPLE_PDF_URI.
                  */}
                  {previewDoc.fileType === 'PDF' ? (
-                    <iframe 
-                        // Use a fallback sample PDF if the URL is a dummy placeholder, to demonstrate the viewer works.
-                        // In a real app, this would be the actual URL.
-                        src={previewDoc.downloadUrl === '#' ? "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" : `${previewDoc.downloadUrl}#toolbar=0`}
-                        className="w-full h-full border-none"
-                        title={previewDoc.title}
-                    />
+                    <>
+                      <iframe 
+                          src={previewDoc.downloadUrl && previewDoc.downloadUrl !== '#' ? `${previewDoc.downloadUrl}#toolbar=0` : SAMPLE_PDF_URI}
+                          className="w-full h-full border-none"
+                          title={previewDoc.title}
+                      />
+                      {/* Overlay for demo items to manage expectations */}
+                      {(!previewDoc.downloadUrl || previewDoc.downloadUrl === '#') && (
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-md shadow-lg flex items-center gap-2 pointer-events-none">
+                           <AlertCircle className="w-4 h-4 text-yellow-400" />
+                           Bản xem trước Demo - Vui lòng tải xuống để xem nội dung đầy đủ
+                        </div>
+                      )}
+                    </>
                  ) : previewDoc.content ? (
-                    // For non-PDF types (like DOCX text extraction), we can still use the markdown renderer
-                    <div className="h-full overflow-y-auto p-8 md:p-16 custom-scrollbar">
+                    // For non-PDF types (like DOCX text extraction), use Markdown renderer
+                    <div className="h-full overflow-y-auto p-8 md:p-16 custom-scrollbar bg-gray-100">
                        <div className="bg-white text-slate-900 p-8 shadow-xl min-h-full max-w-4xl mx-auto rounded-sm border border-gray-300">
                           <MarkdownRenderer content={previewDoc.content} />
                        </div>
