@@ -1,12 +1,12 @@
 
-
 import { GoogleGenAI } from "@google/genai";
 import { Attachment, TutorMode } from '../types';
 import { getSystemInstruction } from '../constants';
 
 const STORAGE_KEY = 'gemini_api_key';
-// Key mặc định được cung cấp bởi người dùng
-const DEFAULT_API_KEY = 'AIzaSyDn3DH2UDFcf-vVMYez3G2E6czCjI8o_Mk';
+// Key mặc định đã bị vô hiệu hóa vì lý do bảo mật. 
+// Người dùng cần nhập key riêng của họ thông qua giao diện UI.
+const DEFAULT_API_KEY = '';
 
 // Helper to safely retrieve API Key
 export const getApiKey = (): string | undefined => {
@@ -34,7 +34,7 @@ export const getApiKey = (): string | undefined => {
     // Ignore ReferenceError
   }
   
-  // 4. Return the hardcoded default key
+  // 4. Return the hardcoded default key (Empty string forces UI prompt)
   return DEFAULT_API_KEY;
 };
 
@@ -49,9 +49,9 @@ export const clearApiKey = () => {
 export const validateApiKey = async (key: string): Promise<{valid: boolean, error?: string}> => {
   try {
     const ai = new GoogleGenAI({ apiKey: key });
-    // Use gemini-3-flash-preview for validation as it is the most stable/available model for connection checks
+    // Use gemini-2.5-flash-latest for validation as it is widely available
     await ai.models.generateContent({
-      model: 'gemini-3-flash-preview', 
+      model: 'gemini-2.5-flash-latest', 
       contents: { parts: [{ text: "ping" }] },
     });
     return { valid: true };
@@ -77,7 +77,7 @@ export const generateTutorResponse = async (
   if (!apiKey) {
     return `⚠️ **CHƯA CÓ API KEY**\n\n` +
            `Hệ thống chưa tìm thấy cấu hình API Key hợp lệ.\n` +
-           `Vui lòng nhập API Key trong phần Cài đặt hoặc popup khởi động để bắt đầu học tập.`;
+           `Vui lòng nhập API Key trong phần Cài đặt hoặc tải lại trang để nhập key mới.`;
   }
 
   try {
@@ -127,12 +127,12 @@ export const generateTutorResponse = async (
     const systemInstruction = getSystemInstruction(mode);
 
     // --- MODEL SELECTION STRATEGY ---
-    // 1. Primary: Gemini 3 Flash Preview (As per latest coding guidelines)
-    // 2. Secondary: Gemini 3 Pro Preview (For complex reasoning fallback)
+    // 1. Primary: Gemini 2.5 Flash Latest (Fast & Capable)
+    // 2. Secondary: Gemini 2.5 Flash (Fallback)
     
     const modelsToTry = [
-        'gemini-3-flash-preview', 
-        'gemini-3-pro-preview', 
+        'gemini-2.5-flash-latest', 
+        'gemini-2.5-flash' 
     ];
 
     let lastError;
@@ -158,14 +158,15 @@ export const generateTutorResponse = async (
     // If all models fail, throw the last error
     throw lastError;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
     // @ts-ignore
     const msg = error?.message || '';
     
-    if (msg.includes('API_KEY_INVALID') || msg.includes('API Key not found') || msg.includes('400')) {
+    if (msg.includes('API_KEY_INVALID') || msg.includes('API Key not found') || msg.includes('403') || msg.includes('PERMISSION_DENIED')) {
+        // Specific handling for the "Leaked Key" or "Permission Denied" error
         clearApiKey(); // Clear invalid key to force re-entry
-        return `🚫 **API Key Không Hợp Lệ**\n\nKey hiện tại đã bị từ chối hoặc không có quyền truy cập model. Vui lòng tải lại trang và nhập Key mới.`;
+        return `🚫 **API Key Đã Bị Chặn**\n\nKey hiện tại đã bị Google vô hiệu hóa (do lộ key hoặc hết hạn mức).\n\nHệ thống đã tự động xóa key lỗi. Vui lòng **Tải lại trang (F5)** để nhập API Key mới.`;
     }
 
     return `**Lỗi kết nối với Gia sư AI:**\n\n${msg}\n\nVui lòng kiểm tra kết nối mạng hoặc thử lại sau.`;
