@@ -38,9 +38,9 @@ export const getApiKey = (): string | undefined => {
 export const validateApiKey = async (apiKey: string): Promise<{ valid: boolean; error?: string }> => {
   try {
     const ai = new GoogleGenAI({ apiKey });
-    // Minimal request to validate key using the latest flash model
+    // Minimal request to validate key using a stable model
     await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.0-flash-exp',
         contents: { parts: [{ text: 'Ping' }] }
     });
     return { valid: true };
@@ -115,10 +115,11 @@ export const generateTutorResponse = async (
     const systemInstruction = getSystemInstruction(mode);
 
     // --- MODEL SELECTION STRATEGY ---
-    // Updated to use Gemini 3 Flash as primary for speed and quality
+    // Use Gemini 2.0 Flash Exp as primary (Stable & Fast)
+    // Fallback to Gemini 2.0 Pro Exp (Higher Intelligence)
     const modelsToTry = [
-        'gemini-3-flash-preview',
-        'gemini-2.5-flash-latest'
+        'gemini-2.0-flash-exp',
+        'gemini-2.0-pro-exp-02-05'
     ];
 
     let lastError;
@@ -161,7 +162,7 @@ export const generateTutorResponse = async (
         errorMsg = String(error);
     }
     
-    // Check for Leaked Key / Permission Denied (403)
+    // Check for Leaked Key / Permission Denied (403) or Not Found (404)
     const isPermissionError = 
         errorMsg.includes('API_KEY_INVALID') || 
         errorMsg.includes('API Key not found') || 
@@ -171,6 +172,10 @@ export const generateTutorResponse = async (
 
     if (isPermissionError) {
         return `🚫 **Lỗi Dịch Vụ AI**\n\nKhóa API hiện tại đã bị từ chối truy cập (Leaked/Expired/Permission Denied).\n\nVui lòng kiểm tra lại API Key trong cài đặt.`;
+    }
+    
+    if (errorMsg.includes('404') || errorMsg.includes('NOT_FOUND')) {
+         return `**Lỗi Mô Hình AI:**\n\nHệ thống không tìm thấy mô hình AI phù hợp (404). Có thể API Key của bạn không hỗ trợ các model mới nhất (Gemini 2.0 Flash).\n\nChi tiết lỗi: ${errorMsg}`;
     }
 
     return `**Lỗi kết nối với Gia sư AI:**\n\n${errorMsg}\n\nVui lòng kiểm tra kết nối mạng hoặc thử lại sau.`;
