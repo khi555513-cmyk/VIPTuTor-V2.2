@@ -1,6 +1,3 @@
-
-
-
 export enum Role {
   USER = 'user',
   MODEL = 'model',
@@ -175,4 +172,5 @@ export interface DocumentItem {
   dateAdded: string;
   fileType: 'PDF' | 'DOCX';
   isVipOnly?: boolean;
+  content?: string; // Content for real preview (Markdown)
 }

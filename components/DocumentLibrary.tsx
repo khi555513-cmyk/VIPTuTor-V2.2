@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { DOCUMENT_LIBRARY, ZALO_CONSULTATION_URL } from '../constants';
 import { DocumentItem, AccountTier } from '../types';
 import { FileText, Download, Lock, Search, Filter, FolderOpen, Crown, Eye, Heart, MessageCircle, X } from 'lucide-react';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface DocumentLibraryProps {
   userTier: AccountTier;
@@ -181,33 +182,56 @@ const DocumentLibrary: React.FC<DocumentLibraryProps> = ({ userTier, onUpgradeRe
          </div>
       </a>
 
-      {/* Preview Modal */}
+      {/* Preview Modal - Z-Index 100 to cover sidebar */}
       {previewDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in" onClick={() => setPreviewDoc(null)}>
-           <div className="bg-white dark:bg-slate-900 w-full max-w-4xl h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fade-in" onClick={() => setPreviewDoc(null)}>
+           <div className="bg-white dark:bg-slate-900 w-full md:max-w-6xl h-full md:h-[95vh] md:rounded-2xl shadow-2xl overflow-hidden flex flex-col relative" onClick={(e) => e.stopPropagation()}>
               
-              <div className="h-14 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center px-4 bg-gray-50 dark:bg-slate-800">
-                 <h3 className="font-bold text-gray-800 dark:text-white truncate pr-4">{previewDoc.title}</h3>
-                 <button onClick={() => setPreviewDoc(null)} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-gray-500 dark:text-gray-400">
+              <div className="h-14 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center px-4 bg-gray-50 dark:bg-slate-900 shrink-0">
+                 <div className="flex items-center gap-2 overflow-hidden">
+                    <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                    <h3 className="font-bold text-gray-800 dark:text-white truncate">{previewDoc.title}</h3>
+                 </div>
+                 <button onClick={() => setPreviewDoc(null)} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors text-gray-500 dark:text-gray-400">
                     <X className="w-5 h-5" />
                  </button>
               </div>
 
-              <div className="flex-1 bg-gray-100 dark:bg-slate-950 p-4 overflow-y-auto flex justify-center items-center">
-                 {/* Simulate Document Preview */}
-                 <div className="bg-white p-8 md:p-12 shadow-md min-h-[500px] w-full max-w-2xl text-center flex flex-col items-center justify-center gap-4">
-                    <FileText className="w-16 h-16 text-gray-300" />
-                    <div>
-                       <p className="text-gray-500 mb-2">Đây là bản xem trước mô phỏng.</p>
-                       <p className="text-sm text-gray-400">Tài liệu: {previewDoc.title}</p>
+              <div className="flex-1 bg-gray-200 dark:bg-black/50 p-0 overflow-hidden relative">
+                 {/* 
+                    PRIORITY: Native PDF Viewer 
+                    Req: "Mở trực tiếp file dưới định dạng pdf" (Open direct file in pdf format)
+                    Req: "Không được tự ý scan văn bản" (Do not scan text) -> Do not use MarkdownRenderer for PDFs
+                 */}
+                 {previewDoc.fileType === 'PDF' ? (
+                    <iframe 
+                        // Use a fallback sample PDF if the URL is a dummy placeholder, to demonstrate the viewer works.
+                        // In a real app, this would be the actual URL.
+                        src={previewDoc.downloadUrl === '#' ? "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" : `${previewDoc.downloadUrl}#toolbar=0`}
+                        className="w-full h-full border-none"
+                        title={previewDoc.title}
+                    />
+                 ) : previewDoc.content ? (
+                    // For non-PDF types (like DOCX text extraction), we can still use the markdown renderer
+                    <div className="h-full overflow-y-auto p-8 md:p-16 custom-scrollbar">
+                       <div className="bg-white text-slate-900 p-8 shadow-xl min-h-full max-w-4xl mx-auto rounded-sm border border-gray-300">
+                          <MarkdownRenderer content={previewDoc.content} />
+                       </div>
                     </div>
-                    <button 
-                        onClick={() => handleDownload(previewDoc)}
-                        className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium shadow-md active:scale-95 transition-all flex items-center gap-2"
-                    >
-                       <Download className="w-4 h-4" /> Tải tài liệu đầy đủ
-                    </button>
-                 </div>
+                 ) : (
+                    /* Fallback for files without content or URL */
+                    <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-white dark:bg-slate-900">
+                        <FileText className="w-16 h-16 text-gray-300 mb-4" />
+                        <p className="text-gray-500 mb-2">Bản xem trước không khả dụng cho tài liệu này.</p>
+                        <p className="text-sm text-gray-400 mb-6">Vui lòng tải xuống để xem nội dung đầy đủ.</p>
+                        <button 
+                            onClick={() => handleDownload(previewDoc)}
+                            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium shadow-md active:scale-95 transition-all flex items-center gap-2"
+                        >
+                           <Download className="w-4 h-4" /> Tải tài liệu
+                        </button>
+                    </div>
+                 )}
               </div>
            </div>
         </div>

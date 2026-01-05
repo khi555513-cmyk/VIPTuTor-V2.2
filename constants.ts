@@ -415,13 +415,414 @@ export const ACTIVATION_CODES: Record<string, { tier: AccountTier, months: numbe
 
 // --- DOCUMENT LIBRARY DATA (ADMIN PROVIDED) ---
 export const DOCUMENT_LIBRARY: DocumentItem[] = [
-  { id: 'doc_1', title: 'Đề thi THPT Quốc Gia 2023 - Mã đề 401', category: 'THPT', description: 'Đề thi chính thức môn Tiếng Anh kỳ thi tốt nghiệp THPT 2023.', downloadUrl: '#', dateAdded: '2023-07-10', fileType: 'PDF' },
-  { id: 'doc_2', title: '1000 Từ vựng IELTS Common', category: 'IELTS', description: 'Danh sách từ vựng phổ biến nhất trong IELTS Reading & Listening.', downloadUrl: '#', dateAdded: '2023-08-15', fileType: 'PDF', isVipOnly: true },
-  { id: 'doc_3', title: 'Đề cương ôn tập Tiếng Anh 9 lên 10', category: 'THCS', description: 'Tổng hợp ngữ pháp trọng tâm thi vào 10 chuyên Anh.', downloadUrl: '#', dateAdded: '2023-05-20', fileType: 'DOCX' },
-  { id: 'doc_4', title: 'Giải chi tiết Đề thi THPT QG 2022', category: 'THPT', description: 'Phân tích chi tiết đáp án và từ vựng.', downloadUrl: '#', dateAdded: '2022-08-01', fileType: 'PDF' },
-  { id: 'doc_5', title: 'IELTS Writing Task 2 Samples (Band 9.0)', category: 'IELTS', description: 'Các bài mẫu Writing đạt điểm tuyệt đối.', downloadUrl: '#', dateAdded: '2023-09-05', fileType: 'PDF', isVipOnly: true },
-  { id: 'doc_6', title: 'Bộ đề thi thử THPT QG 2024 - Trường Chuyên', category: 'THPT', description: 'Đề thi thử từ các trường chuyên nổi tiếng.', downloadUrl: '#', dateAdded: '2024-03-10', fileType: 'PDF', isVipOnly: true },
-  { id: 'doc_7', title: 'Ngữ pháp tiếng Anh cơ bản cho người mất gốc', category: 'KHAC', description: 'Tài liệu nhập môn dễ hiểu.', downloadUrl: '#', dateAdded: '2023-01-10', fileType: 'PDF' },
+  {
+    id: 'doc_collocations_1000',
+    title: '1000 Collocations Hữu Ích - Ôn thi THPTQG & Giao Tiếp',
+    category: 'THPT',
+    description: 'Tuyển tập Collocations trọng tâm 2025: Adjective + Noun, Verb + Noun, Idioms... dành cho ôn thi THPT Quốc Gia, ĐGNL và giao tiếp.',
+    downloadUrl: '#',
+    dateAdded: '2025-05-06',
+    fileType: 'PDF',
+    isVipOnly: false,
+    content: `
+# 1000 COLLOCATIONS HỮU ÍCH
+**“Tuyển tập Collocations trọng tâm cho ôn thi THPTQG, ĐGNL & Giao tiếp hiệu quả”**
+
+**Nhà xuất bản Harriss - 2025**
+
+---
+
+### LỜI NÓI ĐẦU
+Chào mừng bạn đến với cuốn sách “1000 collocations hữu ích” – cẩm nang thiết yếu trên hành trình chinh phục sự tự nhiên và chính xác trong tiếng Anh của bạn!
+
+Trong quá trình học tiếng Anh, đặc biệt là khi hướng tới các kỳ thi quan trọng như ôn thi vào 10, THPT Quốc gia, hay các bài thi đánh giá năng lực, việc nắm vững từ vựng và ngữ pháp là chưa đủ. Để thực sự sử dụng ngôn ngữ một cách thành thạo, tự nhiên như người bản xứ và ghi điểm cao trong các bài thi viết, nói, bạn cần hiểu về cách các từ “đi cùng nhau” – hay còn gọi là Collocations.
+
+---
+
+### 3.1. Adjective + Noun (Tính từ + Danh từ)
+
+| Collocation (Adj + N) | Nghĩa | Giải thích / Phân tích | Ví dụ | Dịch Nghĩa ví dụ |
+| :--- | :--- | :--- | :--- | :--- |
+| **heavy rain** | mưa to, mưa nặng hạt | “Heavy” thường dùng để miêu tả lượng lớn, cường độ cao của nước mưa. | We had **heavy rain** all day yesterday. | Hôm qua trời mưa to cả ngày. |
+| **strong wind** | gió mạnh | “Strong” dùng để miêu tả sức mạnh của gió. | A **strong wind** blew down some trees. | Một cơn gió mạnh đã thổi ngã vài cây. |
+| **deeply concerned** | vô cùng lo ngại | “Deeply” là trạng từ đi với tính từ “concerned” để nhấn mạnh mức độ lo ngại. | She is **deeply concerned** about her son's health. | Cô ấy vô cùng lo ngại về sức khỏe của con trai mình. |
+| **valid argument** | lập luận có căn cứ | “Valid” (hợp lệ, có giá trị) kết hợp với “argument” (lập luận) để chỉ một ý kiến có lý, có cơ sở. | He presented a **valid argument** for his point of view. | Anh ấy đã trình bày một lập luận có căn cứ cho quan điểm của mình. |
+| **significant increase** | tăng đáng kể | “Significant” (đáng kể) đi với “increase” (sự tăng) để chỉ mức độ tăng lớn, quan trọng. | There has been a **significant increase** in sales. | Đã có một sự tăng đáng kể về doanh số. |
+| **key role** | vai trò chủ chốt | “Key” (chìa khóa, quan trọng) đi với “role” (vai trò) để chỉ một vai trò quan trọng, quyết định. | Education plays a **key role** in society. | Giáo dục đóng một vai trò chủ chốt trong xã hội. |
+| **serious problem** | vấn đề nghiêm trọng | “Serious” (nghiêm trọng) đi với “problem” (vấn đề) để chỉ một vấn đề quan trọng, khó khăn. | We need to address this **serious problem** immediately. | Chúng ta cần giải quyết vấn đề nghiêm trọng này ngay lập tức. |
+
+### 3.2. Verb + Noun (Động từ + Danh từ)
+
+| Collocation (V + N) | Nghĩa | Giải thích / Phân tích | Ví dụ | Dịch Nghĩa ví dụ |
+| :--- | :--- | :--- | :--- | :--- |
+| **make a decision** | đưa ra quyết định | “Make” thường đi với các danh từ chỉ hành động tạo ra cái gì đó (về mặt trừu tượng hoặc cụ thể). | You need to **make a decision** soon. | Bạn cần đưa ra quyết định sớm. |
+| **take a break** | nghỉ giải lao | “Take” thường đi với các danh từ chỉ hành động tạm dừng hoặc nhận/lấy cái gì đó. | Let's **take a break** for 10 minutes. | Chúng ta hãy nghỉ giải lao 10 phút. |
+| **do homework** | làm bài tập về nhà | “Do” thường đi với các hoạt động, công việc hoặc nhiệm vụ. | I have to **do my homework** tonight. | Tối nay tôi phải làm bài tập về nhà. |
+| **have a party** | tổ chức tiệc | “Have” thường đi với các sự kiện, trải nghiệm hoặc vật sở hữu. | We are going to **have a party** next Saturday. | Chúng tôi sẽ tổ chức một bữa tiệc vào thứ Bảy tới. |
+| **break a promise** | thất hứa | “Break” (làm vỡ, phá vỡ) đi với “promise” (lời hứa) để chỉ việc không giữ lời hứa. | It's wrong to **break a promise**. | Thất hứa là sai. |
+| **keep a promise** | giữ lời hứa | Ngược lại với “break a promise”, “keep” đi với “promise” để chỉ việc thực hiện lời hứa. | Always try to **keep your promises**. | Luôn cố gắng giữ lời hứa của bạn. |
+| **pay attention** | chú ý | “Pay” (trả) đi với “attention” (sự chú ý) là một collocation cố định. | Please **pay attention** to the teacher. | Làm ơn hãy chú ý nghe giáo viên giảng bài. |
+| **save time** | tiết kiệm thời gian | “Save” (tiết kiệm) đi với “time” (thời gian) chỉ việc sử dụng thời gian hiệu quả. | Taking the bus will **save time**. | Đi xe buýt sẽ tiết kiệm thời gian. |
+| **catch a cold** | bị cảm lạnh | “Catch” (bắt) đi với “cold” (lạnh) chỉ việc mắc bệnh cảm. | Be careful not to **catch a cold**. | Cẩn thận đừng để bị cảm lạnh. |
+
+### 3.3. Adverb + Adjective (Trạng từ + Tính từ)
+
+| Collocation (Adv + Adj) | Nghĩa | Ví dụ |
+| :--- | :--- | :--- |
+| **completely different** | hoàn toàn khác biệt | Their opinions are **completely different**. |
+| **absolutely amazing** | tuyệt đối tuyệt vời | The view was **absolutely amazing**. |
+| **highly recommended** | được đánh giá cao | This book is **highly recommended**. |
+| **terribly sorry** | vô cùng xin lỗi | I'm **terribly sorry** for the mistake. |
+| **remarkably successful** | thành công đáng kể | She was **remarkably successful** at a young age. |
+
+*(Trích lược một phần nội dung từ tài liệu gốc...)*
+`
+  },
+  {
+    id: 'doc_signs_notices',
+    title: 'BỘ ĐỀ ÔN TẬP: DẠNG BÀI BIỂN BÁO (SIGNS & NOTICES)',
+    category: 'THPT',
+    description: 'Tổng hợp các câu hỏi trắc nghiệm về biển báo, thông báo thường gặp trong đề thi.',
+    downloadUrl: '#',
+    dateAdded: '2025-05-07',
+    fileType: 'PDF',
+    isVipOnly: false,
+    content: `
+# BỘ ĐỀ ÔN TẬP: DẠNG BÀI BIỂN BÁO (SIGNS & NOTICES)
+
+*Read the following notice or message and mark the letter A, B, C or D on your answer sheet to indicate the correct answer to each of the following questions.*
+
+---
+
+**Question 1.**
+*[Hình ảnh: Biển báo sàn ướt - CAUTION: WET FLOOR]*
+
+**What are people advised to do when they see this sign?**
+A. Be careful because the floor is slippery.
+B. They can clean the floor if they want.
+C. They should run quickly through the area.
+D. The floor is being repaired and cannot be used.
+
+---
+
+**Question 2.**
+*[Hình ảnh: Biển cấm đỗ xe]*
+
+**What does this sign indicate?**
+A. This is a reserved parking area for staff.
+B. You are not allowed to park your vehicle here.
+C. You can only park here for a limited time.
+D. Parking in this area is free of charge.
+
+---
+
+**Question 3.**
+*[Hình ảnh: Biển cảnh báo khe hở tàu - MIND THE GAP]*
+
+**Where would you most likely see this warning?**
+A. In a library
+B. At a construction site
+C. At a train station
+D. In a hospital elevator
+
+---
+
+**Question 4.**
+*[Hình ảnh: Thùng hàng có biểu tượng ly vỡ - FRAGILE: HANDLE WITH CARE]*
+
+**This label on a package means that...**
+A. the contents are easy to break.
+B. the package is very heavy.
+C. the package should be opened immediately.
+D. the contents are hazardous materials.
+
+---
+
+**Question 5.**
+*[Hình ảnh: Cấm cho động vật ăn - PLEASE DO NOT FEED THE ANIMALS]*
+
+**According to the sign, what are visitors forbidden to do?**
+A. Take pictures of the animals.
+B. Give food to the animals.
+C. Touch the animals.
+D. Make loud noises near the animals.
+
+---
+
+**Question 6.**
+*[Hình ảnh: Biển lối thoát hiểm - EMERGENCY EXIT]*
+
+**What is the purpose of this sign?**
+A. To show the main entrance of the building.
+B. To indicate the location of the restrooms.
+C. To mark a special route for staff only.
+D. To show the way out in case of a fire or other dangers.
+
+---
+
+**Question 7.**
+*[Hình ảnh: Giờ mở cửa - OPENING HOURS: Mon-Fri 9AM-6PM, Sat 10AM-4PM, Sun CLOSED]*
+
+**What does the notice say about the shop's weekend schedule?**
+A. The shop is open all day on Saturday and Sunday.
+B. The shop closes earlier on Saturday and is not open on Sunday.
+C. The shop has the same hours on Saturday as on weekdays.
+D. The shop is only open on Sunday morning.
+
+---
+
+**Question 8.**
+*[Hình ảnh: Phòng họp đang sử dụng - CONFERENCE ROOM IN USE]*
+
+**What does this sign mean?**
+A. The conference room is currently available for a meeting.
+B. The conference room is being cleaned.
+C. You cannot enter because a meeting is happening inside.
+D. You must book the room before you can use it.
+
+---
+
+**Question 9.**
+*[Hình ảnh: Biển cấm hút thuốc]*
+
+**What does this sign mean?**
+A. You are not permitted to smoke in this area.
+B. Cigarettes are sold here.
+C. This is a designated area for smokers.
+D. You should be careful with fire.
+
+---
+
+**Question 10.**
+*[Hình ảnh: Giữ yên lặng - QUIET PLEASE]*
+
+**This sign asks people to...**
+A. ask questions at the information desk.
+B. avoid making noise.
+C. turn off their mobile phones.
+D. stop reading books.
+
+---
+
+**Question 11.**
+*[Hình ảnh: Giữ gìn cỏ - PLEASE KEEP OFF THE GRASS]*
+
+**What are people requested to do?**
+A. Water the grass.
+B. Walk only on the paved paths.
+C. Have a picnic on the grass.
+D. Plant more flowers on the grass.
+
+---
+
+**Question 12.**
+*[Hình ảnh: Thang máy hỏng - OUT OF ORDER]*
+
+**What does this sign mean?**
+A. The elevator is reserved for special guests.
+B. The elevator is working but you must wait.
+C. The elevator is broken and cannot be used.
+D. The elevator will be available in a few minutes.
+
+---
+
+**Question 13.**
+*[Hình ảnh: Cấm chụp ảnh có đèn flash - NO FLASH PHOTOGRAPHY]*
+
+**What is true according to this sign?**
+A. You cannot use your camera at all.
+B. You can take photos, but without using the flash.
+C. You must pay a fee to take pictures.
+D. Only professional photographers are allowed.
+
+---
+
+**Question 14.**
+*[Hình ảnh: Biển báo tốc độ tối đa 50]*
+
+**This sign indicates that...**
+A. you should drive at 50 km/h or more.
+B. the speed limit is 50 km/h.
+C. you are on Highway 50.
+D. the next town is 50 kilometers away.
+
+---
+
+**Question 15.**
+*[Hình ảnh: Mèo lạc - LOST CAT]*
+
+**What is the purpose of this notice?**
+A. To sell a black and white cat.
+B. To ask for help finding a missing pet.
+C. To offer a cat for adoption.
+D. To warn people about a dangerous cat.
+
+---
+
+**Question 16.**
+*[Hình ảnh: Phân loại rác tái chế - PLEASE SORT YOUR RECYCLING]*
+
+**What are people asked to do?**
+A. Throw all their trash into one bin.
+B. Take their recycling home with them.
+C. Put different types of recyclable waste into the correct bins.
+D. Avoid using plastic, paper, and glass products.
+
+---
+
+**Question 17.**
+*[Hình ảnh: Cửa kéo vào - PULL]*
+
+**What should you do to open this door?**
+A. Turn the handle to the right.
+B. Slide the door sideways.
+C. Move the door away from you.
+D. Move the door towards you.
+
+---
+
+**Question 18.**
+*[Hình ảnh: Cảnh báo dị ứng - ALLERGY WARNING: CONTAINS NUTS]*
+
+**This label is important for people who...**
+A. want to eat a healthy diet.
+B. are allergic to nuts.
+C. dislike the taste of nuts.
+D. are looking for a high-protein snack.
+
+---
+
+**Question 19.**
+*[Hình ảnh: Bảng thông tin chuyến bay - FLIGHT BA2491 BOARDING]*
+
+**What does this sign mean for passengers of flight BA2491?**
+A. The flight has been canceled.
+B. The flight is delayed.
+C. They should wait in the lounge.
+D. They can now get on the plane.
+
+---
+
+**Question 20.**
+*[Hình ảnh: Ghế ưu tiên - PRIORITY SEATING]*
+
+**These seats are mainly intended for...**
+A. passengers with special needs.
+B. passengers who pay extra.
+C. the bus driver's family.
+D. passengers with large luggage.
+
+---
+
+**Question 21.**
+*[Hình ảnh: Cấm nhảy cầu - NO DIVING POOL DEPTH: 1.2M]*
+
+**Why are people told not to dive?**
+A. The water is too cold.
+B. The water is not deep enough.
+C. Diving is only for professional swimmers.
+D. The pool is closed for a competition.
+
+---
+
+**Question 22.**
+*[Hình ảnh: Cấm đồ ăn thức uống bên ngoài - NO FOOD OR DRINK FROM OUTSIDE PERMITTED]*
+
+**This rule means that...**
+A. you cannot eat or drink inside the theater.
+B. you can only bring homemade food.
+C. you must buy all snacks and beverages at the theater.
+D. the theater does not sell any food or drinks.
+
+---
+
+**Question 23.**
+*[Hình ảnh: Biển báo có hươu nai qua đường]*
+
+**What does this road sign warn drivers about?**
+A. There is a zoo nearby.
+B. Hunting is allowed in this area.
+C. They should watch out for wild animals crossing the road.
+D. This is a scenic route with many animals to see.
+
+---
+
+**Question 24.**
+*[Hình ảnh: Hướng dẫn giặt ủi - 30°C]*
+
+**What does this instruction mean?**
+A. The item should be ironed at 30°C.
+B. The item should be hand-washed only.
+C. The item should be washed in cool water, not exceeding 30°C.
+D. The item should be dry-cleaned.
+
+---
+
+**Question 25.**
+*[Hình ảnh: Nút bấm qua đường - PRESS BUTTON AND WAIT FOR GREEN LIGHT]*
+
+**What should you do to cross the street safely?**
+A. Cross the street immediately.
+B. Wait for a police officer to help.
+C. Push the button and wait for the signal to change.
+D. Run across when there are no cars.
+
+---
+
+**Question 26.**
+*[Hình ảnh: Đóng cửa xả hàng - CLOSING DOWN SALE! 50% OFF ALL ITEMS]*
+
+**What can you infer from this notice?**
+A. The store is opening a new branch.
+B. The store is celebrating its anniversary.
+C. The store is going out of business permanently.
+D. The store is closed for a holiday.
+
+---
+
+**Question 27.**
+*[Hình ảnh: Chỉ dẫn lối thoát hiểm thang bộ - IN CASE OF FIRE DO NOT USE ELEVATOR USE STAIRS]*
+
+**What is the main purpose of this sign?**
+A. To show guests where the main lobby is.
+B. To provide fire safety instructions.
+C. To advertise the hotel's fitness center.
+D. To explain the room service menu.
+
+---
+
+**Question 28.**
+*[Hình ảnh: Chỉ nhận thẻ - CARD ONLY NO CASH ACCEPTED]*
+
+**How can you pay for your items at this counter?**
+A. By using a credit or debit card.
+B. By paying with cash.
+C. By writing a personal check.
+D. By using a gift voucher.
+
+---
+
+**Question 29.**
+*[Hình ảnh: Cảnh báo điện cao thế - DANGER: HIGH VOLTAGE]*
+
+**This sign warns that you could...**
+A. get an electric shock if you touch the equipment.
+B. damage the equipment if you unplug it.
+C. find a better price for this item elsewhere.
+D. charge your phone using this equipment.
+
+---
+
+**Question 30.**
+*[Hình ảnh: Thông báo máy pha cà phê hỏng]*
+
+**What does the note tell the employees?**
+A. They need to pay for a new coffee machine.
+B. The coffee machine is not working today but will be replaced soon.
+C. The management will bring them free coffee tomorrow.
+D. They should try to fix the coffee machine themselves.
+`
+  }
 ];
 
 // --- PROMPTS ---
