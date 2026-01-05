@@ -3,11 +3,27 @@ import { GoogleGenAI } from "@google/genai";
 import { Attachment, TutorMode } from '../types';
 import { getSystemInstruction } from '../constants';
 
-const DEFAULT_API_KEY = "AIzaSyDgEMJ0qWZPM3pZwWcmeJMXmfNt3gZkdpo";
+// Removed broken default key to force user input for stability
+const STORAGE_KEY = 'gemini_api_key';
 
-// Helper to safely retrieve API Key (from env or use default)
+// Helper to safely retrieve API Key
 export const getApiKey = (): string | undefined => {
-  // 1. Check Env (Process)
+  // 1. Priority: Check Local Storage (User entered key via UI)
+  if (typeof window !== 'undefined') {
+    const storedKey = localStorage.getItem(STORAGE_KEY);
+    if (storedKey && storedKey.trim().length > 0) {
+      return storedKey;
+    }
+  }
+
+  // 2. Check Vite Env (Standard for Vite apps)
+  // @ts-ignore
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+    // @ts-ignore
+    return import.meta.env.VITE_API_KEY;
+  }
+
+  // 3. Fallback: Check Process Env (Legacy/Build time)
   try {
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
       return process.env.API_KEY;
@@ -16,11 +32,17 @@ export const getApiKey = (): string | undefined => {
     // Ignore ReferenceError
   }
   
-  // 2. Return Default Key
-  return DEFAULT_API_KEY;
+  return undefined;
 };
 
-// New function to validate if a key works
+// Clear API Key
+export const clearApiKey = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+};
+
+// Validate Key
 export const validateApiKey = async (key: string): Promise<boolean> => {
   try {
     const ai = new GoogleGenAI({ apiKey: key });
@@ -45,8 +67,8 @@ export const generateTutorResponse = async (
 
   if (!apiKey) {
     return `⚠️ **CHƯA CÓ API KEY**\n\n` +
-           `Hệ thống chưa tìm thấy cấu hình API Key.\n` +
-           `Vui lòng liên hệ quản trị viên.`;
+           `Hệ thống chưa tìm thấy cấu hình API Key hợp lệ.\n` +
+           `Vui lòng nhập API Key trong phần Cài đặt hoặc popup khởi động để bắt đầu học tập.`;
   }
 
   try {
@@ -95,7 +117,7 @@ export const generateTutorResponse = async (
 
     const systemInstruction = getSystemInstruction(mode);
 
-    // Primary model attempt: Gemini 2.0 Flash (Stable)
+    // Primary model attempt: Gemini 2.0 Flash (Stable & Fast)
     try {
       const response = await ai.models.generateContent({
         model: 'gemini-2.0-flash',
@@ -109,11 +131,11 @@ export const generateTutorResponse = async (
       });
       return response.text || "Xin lỗi, tôi không thể tạo câu trả lời vào lúc này.";
     } catch (primaryError) {
-      console.warn("Gemini 2.0 Flash failed. Attempting fallback.", primaryError);
+      console.warn("Gemini 2.0 Flash failed. Attempting fallback to Pro/Lite.", primaryError);
       
-      // Fallback model: Gemini 2.0 Flash Lite (Preview)
+      // Fallback model: Gemini 1.5 Pro (Better reasoning if 2.0 fails)
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-lite-preview-02-05',
+        model: 'gemini-1.5-pro',
         contents: {
           parts: parts
         },
@@ -127,6 +149,14 @@ export const generateTutorResponse = async (
 
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return `**Lỗi kết nối với Gia sư AI:**\n\n${error instanceof Error ? error.message : JSON.stringify(error)}\n\nVui lòng kiểm tra kết nối mạng.`;
+    // @ts-ignore
+    const msg = error?.message || '';
+    
+    if (msg.includes('API_KEY_INVALID') || msg.includes('API Key not found')) {
+        clearApiKey(); // Clear invalid key to force re-entry
+        return `🚫 **API Key Không Hợp Lệ**\n\nKey hiện tại đã bị từ chối. Vui lòng tải lại trang và nhập Key mới.`;
+    }
+
+    return `**Lỗi kết nối với Gia sư AI:**\n\n${msg}\n\nVui lòng kiểm tra kết nối mạng.`;
   }
 };

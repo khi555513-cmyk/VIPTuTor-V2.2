@@ -1,9 +1,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { UserProfile, AccountTier, DailyUsage } from '../types';
-import { User, Target, Camera, Save, CreditCard, LogOut, Crown, Star, CheckCircle, Zap, Shield, MessageCircle, AlertTriangle, Key, Activity } from 'lucide-react';
+import { User, Camera, Save, CreditCard, LogOut, Crown, Star, CheckCircle, Zap, Shield, MessageCircle, AlertTriangle, Key, Activity, RefreshCw } from 'lucide-react';
 import { TIER_LIMITS, SUBSCRIPTION_PACKAGES, ZALO_CONSULTATION_URL, ACTIVATION_CODES } from '../constants';
-import { getApiKey } from '../services/geminiService';
+import { getApiKey, clearApiKey } from '../services/geminiService';
 
 interface UserProfileProps {
   profile: UserProfile;
@@ -37,7 +37,7 @@ const UserProfileView: React.FC<UserProfileProps> = ({
   const [activationMsg, setActivationMsg] = useState<{type: 'success'|'error', text: string} | null>(null);
   
   // API Key State
-  const currentApiKey = getApiKey() || '';
+  const [currentApiKey, setCurrentApiKey] = useState(getApiKey() || '');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,6 +62,14 @@ const UserProfileView: React.FC<UserProfileProps> = ({
     window.open(ZALO_CONSULTATION_URL, '_blank');
   };
   
+  const handleResetApiKey = () => {
+    if (confirm("Bạn có chắc muốn xóa API Key hiện tại? Bạn sẽ cần nhập Key mới để tiếp tục sử dụng.")) {
+      clearApiKey();
+      setCurrentApiKey('');
+      window.location.reload(); // Reload to trigger the ApiKeyModal again
+    }
+  };
+  
   const handleActivateCode = () => {
     setActivationMsg(null);
     const code = activationCode.trim().toUpperCase();
@@ -71,7 +79,6 @@ const UserProfileView: React.FC<UserProfileProps> = ({
       return;
     }
 
-    // Special commands (Always allowed)
     if (code === 'BASIC' || code === 'RESET') {
        onUpdateProfile({ ...formData, accountTier: 'basic', subscriptionExpiry: null });
        setActivationMsg({ type: 'success', text: "Đã chuyển về gói Cơ Bản." });
@@ -79,22 +86,18 @@ const UserProfileView: React.FC<UserProfileProps> = ({
        return;
     }
 
-    // Check if code was already used by this user
     if (profile.usedCodes && profile.usedCodes.includes(code)) {
       setActivationMsg({ type: 'error', text: "Mã này đã được bạn sử dụng rồi." });
       return;
     }
 
-    // Check against Valid Codes Dictionary
     const config = ACTIVATION_CODES[code];
 
     if (config) {
        let newExpiry: number | null = null;
        const months = config.months;
 
-       // Calculate expiry
        if (months >= 900) {
-         // Lifetime
          newExpiry = null;
        } else {
          const now = Date.now();
@@ -118,7 +121,6 @@ const UserProfileView: React.FC<UserProfileProps> = ({
        });
        setActivationCode('');
        
-       // Close activation box after delay
        setTimeout(() => {
           setActivationMsg(null);
           setIsActivationOpen(false);
@@ -251,13 +253,11 @@ const UserProfileView: React.FC<UserProfileProps> = ({
 
           {/* 2. User Info */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            {/* Cover Image */}
             <div className={`h-24 md:h-32 relative ${profile.accountTier === 'vip' ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' : profile.accountTier === 'pro' ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-gradient-to-r from-gray-400 to-gray-600'}`}>
             </div>
             
             <div className="px-4 md:px-6 pb-6 relative">
               <div className="flex flex-col md:flex-row items-center md:items-end -mt-12 md:-mt-14 mb-6 gap-4">
-                {/* Avatar */}
                 <div className="relative group shrink-0">
                   <div className={`w-24 h-24 md:w-28 md:h-28 rounded-full border-[5px] border-white bg-gray-200 overflow-hidden shadow-lg ${profile.accountTier === 'vip' ? 'ring-4 ring-yellow-400/30' : ''}`}>
                     {formData.avatar ? (
@@ -314,7 +314,6 @@ const UserProfileView: React.FC<UserProfileProps> = ({
                 </div>
               </div>
 
-              {/* Form Fields - Compact Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Họ và tên</label>
@@ -352,6 +351,12 @@ const UserProfileView: React.FC<UserProfileProps> = ({
                   <Key className="w-5 h-5 text-gray-600" />
                   Cấu hình API Key
                 </h3>
+                <button 
+                  onClick={handleResetApiKey}
+                  className="text-xs flex items-center gap-1 text-gray-500 hover:text-indigo-600 transition-colors border px-2 py-1 rounded bg-gray-50 hover:bg-indigo-50"
+                >
+                  <RefreshCw className="w-3 h-3" /> Đổi Key
+                </button>
              </div>
              
              <div className="bg-gray-100 p-3 rounded-lg flex justify-between items-center">
@@ -413,7 +418,7 @@ const UserProfileView: React.FC<UserProfileProps> = ({
                </div>
              )}
 
-             {/* Pricing Grid - RESPONSIVE MODIFICATION */}
+             {/* Pricing Grid */}
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {SUBSCRIPTION_PACKAGES.map((pkg) => {
                   const isBasic = pkg.tier === 'basic';
@@ -473,7 +478,6 @@ const UserProfileView: React.FC<UserProfileProps> = ({
              </p>
           </div>
 
-          {/* Reset System (Danger Zone) */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6 mb-8">
                <h3 className="font-bold text-gray-800 mb-2 text-base">Khu vực nguy hiểm</h3>
                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

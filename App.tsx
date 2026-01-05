@@ -21,7 +21,15 @@ const App: React.FC = () => {
   const isResettingRef = useRef(false);
 
   // --- API Key State ---
-  const [hasApiKey, setHasApiKey] = useState<boolean>(!!getApiKey());
+  const [hasApiKey, setHasApiKey] = useState<boolean>(false);
+
+  // Check key on mount (and only on mount)
+  useEffect(() => {
+    const key = getApiKey();
+    if (key) {
+      setHasApiKey(true);
+    }
+  }, []);
 
   // --- App Data State ---
   const [sessions, setSessions] = useState<ChatSession[]>(() => {
