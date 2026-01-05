@@ -1,12 +1,10 @@
 
-
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   FileText, Clock, Upload, CheckCircle, AlertCircle, 
   Printer, GraduationCap, X, BookOpen, Brain, Play, Maximize2, Download
 } from 'lucide-react';
 import { TestConfig, ExamData, ExamResult } from '../types';
-import { GoogleGenAI } from "@google/genai";
 import mammoth from 'mammoth';
 import { TEST_GENERATOR_PROMPT, TEST_GRADER_PROMPT } from '../constants';
 import MarkdownRenderer from './MarkdownRenderer';
@@ -83,21 +81,19 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
       return;
     }
 
+    if (!window.puter || !window.puter.ai) {
+       alert("Lỗi: Thư viện AI chưa sẵn sàng. Vui lòng tải lại trang.");
+       return;
+    }
+
     setStep('generating');
     incrementUsage(); // Deduct usage
 
-    const apiKey = getApiKey();
-    if (!apiKey) {
-      alert("⚠️ Lỗi: Chưa cấu hình API Key. Vui lòng kiểm tra file .env hoặc cấu hình key.");
-      setStep('config');
-      return;
-    }
-
     try {
-      const ai = new GoogleGenAI({ apiKey });
-      
       const prompt = `
-        Yêu cầu tạo đề thi:
+        ${TEST_GENERATOR_PROMPT}
+
+        Yêu cầu tạo đề thi chi tiết:
         - Trình độ/Lớp: ${config.gradeLevel}
         - Định dạng: ${config.examFormat}
         - Thời gian: ${config.duration} phút
@@ -107,16 +103,10 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
         Hãy tạo JSON đề thi theo đúng format yêu cầu. Chú ý tạo đầy đủ các phần: Phonetics, Grammar, Reading (có passageContent), Writing.
       `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: { parts: [{ text: prompt }] },
-        config: {
-          systemInstruction: TEST_GENERATOR_PROMPT,
-          temperature: 0.5,
-        }
-      });
-
-      const text = response.text || "";
+      // Use Claude Opus for best reasoning in exam creation
+      const response = await window.puter.ai.chat(prompt, { model: 'claude-opus-4-5' });
+      const text = response.message.content[0].text || "";
+      
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       
       if (jsonMatch) {
@@ -134,7 +124,7 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
       }
     } catch (e) {
       console.error(e);
-      alert("Lỗi khi tạo đề thi. Vui lòng thử lại chi tiết hơn.");
+      alert("Lỗi khi tạo đề thi với Claude. Vui lòng thử lại.");
       setStep('config');
     }
   };
@@ -211,33 +201,25 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
     handleExitFullScreen();
 
     setStep('grading');
-    const apiKey = getApiKey();
-    if (!apiKey) return;
 
     try {
-      const ai = new GoogleGenAI({ apiKey });
-      
       const gradingPayload = {
         examData: examData,
         userAnswers: userAnswers
       };
 
       const prompt = `
+        ${TEST_GRADER_PROMPT}
+
         Dữ liệu bài làm: ${JSON.stringify(gradingPayload)}
         
         Hãy chấm điểm theo đúng format JSON yêu cầu.
       `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview', 
-        contents: { parts: [{ text: prompt }] },
-        config: {
-          systemInstruction: TEST_GRADER_PROMPT,
-          temperature: 0.2,
-        }
-      });
+      // Use Claude Opus for grading accuracy
+      const response = await window.puter.ai.chat(prompt, { model: 'claude-opus-4-5' });
+      const text = response.message.content[0].text || "";
 
-      const text = response.text || "";
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       
       if (jsonMatch) {
@@ -324,7 +306,7 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-gray-800 leading-tight">Hệ Thống Luyện Thi VIP Pro</h1>
-              <p className="text-gray-500 text-sm md:text-base">Thiết kế đề thi chuẩn 99% - Phân tích chuyên sâu</p>
+              <p className="text-gray-500 text-sm md:text-base">Thiết kế đề thi chuẩn 99% - Phân tích chuyên sâu (Powered by Claude Opus)</p>
             </div>
           </div>
 
@@ -443,7 +425,7 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
                 </div>
              </div>
              <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">
-               {step === 'generating' ? 'Đang Thiết Kế Đề Thi...' : 'AI Đang Chấm Bài...'}
+               {step === 'generating' ? 'Đang Thiết Kế Đề Thi (Claude)...' : 'AI Đang Chấm Bài (Claude)...'}
              </h2>
              <p className="text-gray-500 text-sm">
                {step === 'generating' ? 'Hệ thống đang phân tích cấu trúc và soạn câu hỏi chuẩn A4.' : 'Đang phân tích đáp án và viết lời phê chi tiết.'}

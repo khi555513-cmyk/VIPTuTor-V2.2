@@ -1,3 +1,4 @@
+
 export enum Role {
   USER = 'user',
   MODEL = 'model',
@@ -173,4 +174,16 @@ export interface DocumentItem {
   fileType: 'PDF' | 'DOCX';
   isVipOnly?: boolean;
   content?: string; // Content for real preview (Markdown)
+}
+
+// Global Window Extension for Puter
+declare global {
+  interface Window {
+    puter: {
+      ai: {
+        chat: (prompt: string, options?: { model?: string; stream?: boolean }) => Promise<{ message: { content: { text: string }[] } }>;
+      };
+      print: (text: string) => void;
+    };
+  }
 }

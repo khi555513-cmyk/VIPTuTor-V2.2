@@ -1,58 +1,16 @@
 
-import { GoogleGenAI } from "@google/genai";
 import { Attachment, TutorMode } from '../types';
 import { getSystemInstruction } from '../constants';
 
-const DEFAULT_API_KEY = 'AIzaSyBI4BP3mcdnuMhk0nqE-eXsTmt-jwumqE8';
-
-// Helper to safely retrieve API Key
+// We simulate getting an API key because the rest of the app might call this.
+// For Puter.js/Claude, we don't need a real key.
 export const getApiKey = (): string | undefined => {
-  // 0. Check Local Storage (User provided key via Modal)
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-       const storedKey = localStorage.getItem('gemini_api_key');
-       if (storedKey) return storedKey;
-    }
-  } catch (e) {}
-
-  // 1. Check Vite Env (Standard for Vite apps)
-  // @ts-ignore
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
-    // @ts-ignore
-    return import.meta.env.VITE_API_KEY;
-  }
-
-  // 2. Fallback: Check Process Env (Legacy/Build time)
-  try {
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return process.env.API_KEY;
-    }
-  } catch (e) {
-    // Ignore ReferenceError
-  }
-  
-  // 3. Return the hardcoded default key
-  return DEFAULT_API_KEY;
+  return "PUTER_CLAUDE_FREE_ACCESS";
 };
 
+// Always valid because Puter handles auth via "User-Pays" (or free tier)
 export const validateApiKey = async (apiKey: string): Promise<{ valid: boolean; error?: string }> => {
-  try {
-    const ai = new GoogleGenAI({ apiKey });
-    // Minimal request to validate key using a stable model
-    await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
-        contents: { parts: [{ text: 'Ping' }] }
-    });
-    return { valid: true };
-  } catch (error: any) {
-    console.warn("API Key Validation Failed:", error);
-    let errorMsg = error.message || "Unknown error";
-    // Check for common auth errors
-    if (errorMsg.includes('403') || errorMsg.includes('API key not valid') || errorMsg.includes('PERMISSION_DENIED')) {
-        errorMsg = "API Key không hợp lệ hoặc không có quyền truy cập model.";
-    }
-    return { valid: false, error: errorMsg };
-  }
+  return { valid: true };
 };
 
 export const generateTutorResponse = async (
@@ -60,124 +18,59 @@ export const generateTutorResponse = async (
   attachments: Attachment[],
   mode: TutorMode
 ): Promise<string> => {
-  const apiKey = getApiKey();
-
-  if (!apiKey) {
-    return `⚠️ **Lỗi Cấu Hình Hệ Thống**\n\n` +
-           `Hệ thống chưa tìm thấy API Key.\n` +
-           `Vui lòng cập nhật API Key trong phần Cài đặt hoặc liên hệ quản trị viên.`;
-  }
-
   try {
-    // Initialize the client per request
-    const ai = new GoogleGenAI({ apiKey: apiKey });
-
-    const parts: any[] = [];
-    let promptText = text;
-
-    // Add attachments if any
-    if (attachments && attachments.length > 0) {
-      attachments.forEach(att => {
-        // Safe guard against empty data
-        if (!att.data) return;
-
-        // If it's a text attachment (e.g. converted DOCX), append to prompt
-        if (att.isText) {
-          promptText += `\n\n[Attached Document Content - ${att.name || 'Doc'}]:\n${att.data}\n`;
-        } 
-        // If it's a regular supported binary (Image, PDF)
-        else {
-          try {
-             // Remove data:image/png;base64, prefix if present for clean base64
-             const base64Data = att.data.includes(',') ? att.data.split(',')[1] : att.data;
-             if (base64Data) {
-                parts.push({
-                  inlineData: {
-                    mimeType: att.mimeType,
-                    data: base64Data
-                  }
-                });
-             }
-          } catch (err) {
-             console.error("Error processing attachment:", err);
-          }
-        }
-      });
+    if (!window.puter || !window.puter.ai) {
+      throw new Error("Puter.js library not loaded. Please refresh the page.");
     }
 
-    // Add text prompt
-    if (promptText) {
-      parts.push({ text: promptText });
-    } else if (parts.length === 0) {
-       return "Vui lòng nhập câu hỏi hoặc tải lên hình ảnh để bắt đầu.";
-    }
-
+    let promptText = "";
     const systemInstruction = getSystemInstruction(mode);
 
-    // --- MODEL SELECTION STRATEGY ---
-    // Use Gemini 2.0 Flash Exp as primary (Stable & Fast)
-    // Fallback to Gemini 2.0 Pro Exp (Higher Intelligence)
-    const modelsToTry = [
-        'gemini-2.0-flash-exp',
-        'gemini-2.0-pro-exp-02-05'
-    ];
+    // 1. Construct the Prompt with System Instruction
+    // Claude via Puter simple chat interface works best with a combined prompt string
+    promptText += `System Instructions:\n${systemInstruction}\n\n`;
 
-    let lastError;
-
-    for (const model of modelsToTry) {
-        try {
-            const response = await ai.models.generateContent({
-                model: model,
-                contents: { parts: parts },
-                config: {
-                    systemInstruction: systemInstruction,
-                    temperature: 0.7, 
-                }
-            });
-            return response.text || "Xin lỗi, tôi không thể tạo câu trả lời vào lúc này.";
-        } catch (error) {
-            console.warn(`Model ${model} failed. Trying next...`, error);
-            lastError = error;
-            // Continue to next model
+    // 2. Process Attachments (Text Only for stability)
+    // Puter.js simple interface documents text-only prompts primarily.
+    // To ensure stability, we extract text content from attachments and append to prompt.
+    // Image analysis is skipped to avoid API errors with the Puter wrapper.
+    if (attachments && attachments.length > 0) {
+      promptText += `\n--- ATTACHED CONTEXT ---\n`;
+      attachments.forEach(att => {
+        if (att.isText && att.data) {
+           promptText += `\n[File: ${att.name}]:\n${att.data}\n`;
+        } else if (att.mimeType.startsWith('image/')) {
+           promptText += `\n[Image: ${att.name}] (Image analysis is currently optimized for text context only in this version)\n`;
         }
+      });
+      promptText += `\n--- END CONTEXT ---\n\n`;
     }
 
-    // If all models fail, throw the last error
-    throw lastError;
+    // 3. Add User Message
+    promptText += `User Query:\n${text}`;
+
+    // 4. Select Model based on Mode
+    // Using Claude 4.5 models as requested for maximum performance
+    let modelName = 'claude-sonnet-4-5'; // Default balanced model
+    
+    if (mode === TutorMode.THEORY || mode === TutorMode.TEST_PREP) {
+       modelName = 'claude-opus-4-5'; // High intelligence for complex theory/exams
+    } else if (mode === TutorMode.GAME) {
+       modelName = 'claude-sonnet-4-5'; // Fast and creative
+    }
+
+    // 5. Call Puter AI
+    const response = await window.puter.ai.chat(promptText, { model: modelName });
+    
+    // 6. Extract Text
+    if (response && response.message && response.message.content && response.message.content.length > 0) {
+        return response.message.content[0].text;
+    } else {
+        throw new Error("Empty response from AI provider.");
+    }
 
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    
-    // Robust error message extraction
-    let errorMsg = '';
-    if (error instanceof Error) {
-        errorMsg = error.message;
-    } else if (typeof error === 'object') {
-        try {
-            errorMsg = JSON.stringify(error);
-        } catch (e) {
-            errorMsg = String(error);
-        }
-    } else {
-        errorMsg = String(error);
-    }
-    
-    // Check for Leaked Key / Permission Denied (403) or Not Found (404)
-    const isPermissionError = 
-        errorMsg.includes('API_KEY_INVALID') || 
-        errorMsg.includes('API Key not found') || 
-        errorMsg.includes('403') || 
-        errorMsg.includes('PERMISSION_DENIED') ||
-        errorMsg.includes('leaked');
-
-    if (isPermissionError) {
-        return `🚫 **Lỗi Dịch Vụ AI**\n\nKhóa API hiện tại đã bị từ chối truy cập (Leaked/Expired/Permission Denied).\n\nVui lòng kiểm tra lại API Key trong cài đặt.`;
-    }
-    
-    if (errorMsg.includes('404') || errorMsg.includes('NOT_FOUND')) {
-         return `**Lỗi Mô Hình AI:**\n\nHệ thống không tìm thấy mô hình AI phù hợp (404). Có thể API Key của bạn không hỗ trợ các model mới nhất (Gemini 2.0 Flash).\n\nChi tiết lỗi: ${errorMsg}`;
-    }
-
-    return `**Lỗi kết nối với Gia sư AI:**\n\n${errorMsg}\n\nVui lòng kiểm tra kết nối mạng hoặc thử lại sau.`;
+    console.error("Claude/Puter API Error:", error);
+    return `**Lỗi kết nối AI (Claude):**\n\n${error.message || "Unknown error"}\n\nVui lòng thử lại sau.`;
   }
 };
