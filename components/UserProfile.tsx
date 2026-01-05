@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { UserProfile, AccountTier, DailyUsage } from '../types';
-import { User, Target, Camera, Save, CreditCard, LogOut, Crown, Star, CheckCircle, Zap, Shield, MessageCircle, AlertTriangle, Key } from 'lucide-react';
+import { User, Target, Camera, Save, CreditCard, LogOut, Crown, Star, CheckCircle, Zap, Shield, MessageCircle, AlertTriangle, Key, Activity } from 'lucide-react';
 import { TIER_LIMITS, SUBSCRIPTION_PACKAGES, ZALO_CONSULTATION_URL, ACTIVATION_CODES } from '../constants';
 import { getApiKey } from '../services/geminiService';
 
@@ -232,15 +232,21 @@ const UserProfileView: React.FC<UserProfileProps> = ({
              </div>
              
              {/* Expiry Info */}
-             {profile.accountTier !== 'basic' && (
-               <div className="mt-4 flex items-center justify-end text-sm text-gray-500">
-                 <Shield className="w-4 h-4 mr-1" />
-                 Hạn sử dụng: 
-                 <strong className="ml-1 text-gray-800">
-                   {profile.subscriptionExpiry ? new Date(profile.subscriptionExpiry).toLocaleDateString('vi-VN') : "Vĩnh viễn"}
-                 </strong>
+             <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm gap-2">
+               <div className="flex items-center gap-1 text-gray-500">
+                  <Activity className="w-4 h-4 text-green-500" />
+                  <span className="text-xs">Hệ thống đang hoạt động ổn định</span>
                </div>
-             )}
+               {profile.accountTier !== 'basic' && (
+                  <div className="flex items-center text-gray-500">
+                    <Shield className="w-4 h-4 mr-1" />
+                    Hạn sử dụng: 
+                    <strong className="ml-1 text-gray-800">
+                      {profile.subscriptionExpiry ? new Date(profile.subscriptionExpiry).toLocaleDateString('vi-VN') : "Vĩnh viễn"}
+                    </strong>
+                  </div>
+               )}
+             </div>
           </div>
 
           {/* 2. User Info */}

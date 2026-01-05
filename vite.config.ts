@@ -5,7 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   define: {
-    // Polyfill process.env for the existing code logic, specifically for API_KEY checks
-    'process.env': {}
+    // Polyfill process.env for client-side usage if needed by some libs, 
+    // though ideally import.meta.env should be used. 
+    // This maintains compatibility with the existing service code.
+    'process.env': process.env
   }
 })

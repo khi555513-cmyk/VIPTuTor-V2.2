@@ -3,21 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>VIP English Tutor</title>
-    <!-- Keep Tailwind CDN for simplicity as per user request to maintain look -->
+    <title>VIP English Tutor Pro</title>
+    <!-- Tailwind CSS (via CDN for simplicity in this setup, though PostCSS is better for prod) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.3s ease-out forwards',
+              'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'pop-in': 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+              'float': 'float 3s ease-in-out infinite',
+              'shimmer': 'shimmer 2.5s infinite linear',
+              'progress': 'progress-indeterminate 1.5s infinite ease-in-out',
+            },
+            keyframes: {
+              fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+              slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+              popIn: { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+              float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } },
+              shimmer: { '0%': { backgroundPosition: '200% 0' }, '100%': { backgroundPosition: '-200% 0' } },
+              'progress-indeterminate': { 
+                '0%': { width: '0%', marginLeft: '0' }, 
+                '50%': { width: '60%', marginLeft: '20%' }, 
+                '100%': { width: '0%', marginLeft: '100%' } 
+              }
+            }
+          }
+        }
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- KaTeX for Math Support (Maintained as CDN to support existing global window checks) -->
+    <!-- KaTeX for Math Support -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     
-    <!-- Highlight.js (Maintained as CDN to support existing global window checks) -->
+    <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
-    <!-- Canvas Confetti (Maintained as CDN backup but package is also installed) -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
     <style>
       body {
@@ -25,222 +54,54 @@
         touch-action: pan-x pan-y;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        overscroll-behavior-y: none; /* Prevent pull-to-refresh on mobile */
       }
-
-      /* --- Custom Scrollbar --- */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
-        border-radius: 99px;
-        transition: background 0.2s;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
-      }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-      /* --- Animations --- */
-      @keyframes slideUpFade {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .animate-slide-up { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-      .animate-fade-in { animation: slideUpFade 0.3s ease-out forwards; }
-      .animate-pop-in { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-      @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
-      @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-      .animate-shimmer { animation: shimmer 3s infinite linear; }
-      @keyframes progress-indeterminate { 0% { width: 0%; margin-left: 0; } 50% { width: 60%; margin-left: 20%; } 100% { width: 0%; margin-left: 100%; } }
-      .animate-progress { animation: progress-indeterminate 1.5s infinite ease-in-out; }
-      @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
-      .animate-float { animation: float 3s ease-in-out infinite; }
-
-      /* --- PROSE VIP: Scientific & Modern Typography --- */
-      .prose-vip {
-        font-size: 0.95rem; /* 15.2px */
-        line-height: 1.75;
-        color: #334155; /* slate-700 */
-        word-wrap: break-word;
-      }
-
-      /* Headings */
-      .prose-vip h1, .prose-vip h2, .prose-vip h3, .prose-vip h4 {
-        color: #0f172a; /* slate-900 */
-        font-weight: 700;
-        margin-top: 1.5em;
-        margin-bottom: 0.75em;
-        line-height: 1.3;
-        letter-spacing: -0.02em;
-      }
-      .prose-vip h1 { font-size: 1.6rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; margin-top: 0.5em; }
-      .prose-vip h2 { font-size: 1.35rem; position: relative; padding-left: 0; }
-      .prose-vip h3 { font-size: 1.15rem; color: #1e293b; }
-      .prose-vip h4 { font-size: 1rem; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-top: 1.2em; }
-
-      /* Paragraphs & Lists */
-      .prose-vip p { margin-bottom: 1em; text-align: justify; }
-      .prose-vip ul, .prose-vip ol { margin-bottom: 1em; padding-left: 1.2em; }
-      .prose-vip ul { list-style-type: disc; }
-      .prose-vip ol { list-style-type: decimal; }
-      .prose-vip li { margin-bottom: 0.4em; padding-left: 0.3em; position: relative; }
-      .prose-vip li::marker { color: #6366f1; font-weight: bold; } /* Indigo bullet */
-
-      /* Emphasis */
-      .prose-vip strong { color: #0f172a; font-weight: 700; }
-      .prose-vip em { color: #475569; font-style: italic; }
-      .prose-vip a { color: #4f46e5; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #4f46e5; transition: all 0.2s; }
-      .prose-vip a:hover { color: #4338ca; border-bottom-style: solid; }
-
-      /* Blockquotes (Callouts) */
-      .prose-vip blockquote {
-        border-left: 4px solid #6366f1;
-        background: #f8fafc; /* slate-50 */
-        margin: 1.5em 0;
-        padding: 1em 1.25em;
-        border-radius: 0 0.75em 0.75em 0;
-        color: #475569;
-        font-style: italic;
-        position: relative;
-      }
-      .prose-vip blockquote p:last-child { margin-bottom: 0; }
-
-      /* Tables (Scientific Style) */
-      .table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-        margin: 1.5em 0;
-        border-radius: 0.75rem;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      }
-      .prose-vip table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-      }
-      .prose-vip th {
-        background-color: #f1f5f9; /* slate-100 */
-        color: #334155;
-        font-weight: 600;
-        text-align: left;
-        padding: 0.75rem 1rem;
-        border-bottom: 2px solid #cbd5e1;
-        white-space: nowrap;
-      }
-      .prose-vip td {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid #e2e8f0;
-        color: #475569;
-      }
-      .prose-vip tr:last-child td { border-bottom: none; }
-      .prose-vip tr:nth-child(even) { background-color: #fafafa; } /* Zebra striping */
-      .prose-vip tr:hover { background-color: #f8fafc; }
-
-      /* Inline Code */
-      .prose-vip :not(pre) > code {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.85em;
-        background-color: #f1f5f9;
-        color: #db2777; /* pink-600 */
-        padding: 0.2em 0.4em;
-        border-radius: 0.375rem;
-        border: 1px solid #e2e8f0;
-      }
-
-      /* Code Blocks (Mac Window Style) */
-      .code-block-wrapper {
-        margin: 1.5em 0;
-        border-radius: 0.75rem;
-        overflow: hidden;
-        background-color: #1a1b26; /* Tokyo Night bg */
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      }
-      .code-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background-color: #24283b;
-        padding: 0.5rem 1rem;
-        border-bottom: 1px solid #414868;
-      }
-      .code-dots { display: flex; gap: 0.4rem; }
-      .code-dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
-      .dot-red { background-color: #f87171; }
-      .dot-yellow { background-color: #facc15; }
-      .dot-green { background-color: #4ade80; }
-      .code-lang { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #9aa5ce; text-transform: uppercase; }
-      .copy-btn {
-        background: transparent;
-        border: 1px solid #565f89;
-        color: #a9b1d6;
-        border-radius: 0.375rem;
-        padding: 0.2rem 0.5rem;
-        font-size: 0.7rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-      }
-      .copy-btn:hover { background-color: #414868; color: white; }
       
-      .prose-vip pre {
-        margin: 0;
-        padding: 1rem;
-        overflow-x: auto;
-        background-color: transparent;
-      }
-      .prose-vip pre code {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.85em;
-        line-height: 1.6;
-        color: #a9b1d6;
-        background-color: transparent;
-        padding: 0;
-        border: none;
-      }
-
-      /* KaTeX (Math) Overrides */
-      .katex-display {
-        margin: 1em 0 !important;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 0.5em 0;
-      }
-      .katex { font-size: 1.1em; }
-      .katex-html { overflow: hidden; } /* Prevent layout shift */
-
-      /* Horizontal Rule */
-      .prose-vip hr { border: 0; height: 1px; background: #e2e8f0; margin: 2em 0; }
+      /* Scrollbar Styling */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; transition: background 0.2s; }
+      ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+      
+      /* Typography for Markdown Content */
+      .prose-vip { color: #334155; line-height: 1.75; font-size: 0.95rem; }
+      .prose-vip h1, .prose-vip h2, .prose-vip h3 { color: #0f172a; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.75em; line-height: 1.3; }
+      .prose-vip h1 { font-size: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; }
+      .prose-vip h2 { font-size: 1.25rem; }
+      .prose-vip p { margin-bottom: 1em; text-align: justify; }
+      .prose-vip ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+      .prose-vip ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em; }
+      .prose-vip li { margin-bottom: 0.5em; }
+      .prose-vip strong { color: #0f172a; font-weight: 700; }
+      .prose-vip code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background-color: #f1f5f9; color: #db2777; padding: 0.2em 0.4em; border-radius: 0.375rem; }
+      .prose-vip pre { background-color: #1e293b; color: #e2e8f0; padding: 1em; border-radius: 0.75rem; overflow-x: auto; margin: 1.5em 0; }
+      .prose-vip pre code { background-color: transparent; color: inherit; padding: 0; }
+      .prose-vip blockquote { border-left: 4px solid #6366f1; padding-left: 1em; margin: 1.5em 0; color: #475569; font-style: italic; background: #f8fafc; padding: 1rem; border-radius: 0 0.5rem 0.5rem 0; }
+      .prose-vip table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.9rem; }
+      .prose-vip th { background-color: #f1f5f9; font-weight: 600; text-align: left; padding: 0.75rem; border-bottom: 2px solid #cbd5e1; }
+      .prose-vip td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+      .prose-vip tr:nth-child(even) { background-color: #fafafa; }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "vite": "https://esm.sh/vite@^7.3.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
     "marked": "https://esm.sh/marked@^17.0.1",
-    "canvas-confetti": "https://esm.sh/canvas-confetti@^1.9.4",
     "dompurify": "https://esm.sh/dompurify@^3.3.1",
-    "mammoth": "https://esm.sh/mammoth@^1.11.0"
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "mammoth": "https://esm.sh/mammoth@^1.11.0",
+    "canvas-confetti": "https://esm.sh/canvas-confetti@^1.9.4",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
 </head>
   <body class="bg-slate-50 text-slate-900 h-[100dvh] overflow-hidden selection:bg-indigo-100 selection:text-indigo-700">
     <div id="root"></div>
-    <!-- Vite Entry Point -->
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
