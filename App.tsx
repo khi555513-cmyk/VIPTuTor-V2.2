@@ -10,28 +10,14 @@ import MiniGame from './components/MiniGame';
 import UserProfileView from './components/UserProfile';
 import SubscriptionExpiredModal from './components/SubscriptionExpiredModal';
 import LimitReachedModal from './components/LimitReachedModal';
-import ApiKeyModal from './components/ApiKeyModal';
 import DocumentLibrary from './components/DocumentLibrary';
 import { ChatSession, SavedKnowledgeItem, Message, Role, AppNotification, GameData, UserProfile, DailyUsage } from './types';
 import { TIER_LIMITS } from './constants';
 import { Menu } from 'lucide-react';
-import { getApiKey } from './services/geminiService';
 
 const App: React.FC = () => {
   // Ref to track if we are in the process of resetting data
   const isResettingRef = useRef(false);
-
-  // --- API Key State ---
-  // Initialize directly from getApiKey to avoid modal flash since we now have a default key
-  const [hasApiKey, setHasApiKey] = useState<boolean>(!!getApiKey());
-
-  // Check key on mount (safety check)
-  useEffect(() => {
-    const key = getApiKey();
-    if (key) {
-      setHasApiKey(true);
-    }
-  }, []);
 
   // --- App Data State ---
   const [sessions, setSessions] = useState<ChatSession[]>(() => {
@@ -133,7 +119,6 @@ const App: React.FC = () => {
   const [limitModalMessage, setLimitModalMessage] = useState('');
 
   // --- Effects for Persistence ---
-  // We check !isResettingRef.current to prevent writing stale data back to localStorage during a reset
   useEffect(() => {
     if (!isResettingRef.current) localStorage.setItem('vip_tutor_sessions', JSON.stringify(sessions));
   }, [sessions]);
@@ -201,7 +186,6 @@ const App: React.FC = () => {
   };
 
   // --- WATCHDOG: Subscription Expiry Check ---
-  // Runs immediately and then every 30s to ensure real-time downgrade
   useEffect(() => {
     const checkExpiry = () => {
       // Only check if not already basic and has an expiry date
@@ -487,10 +471,6 @@ const App: React.FC = () => {
       );
     }
   };
-
-  if (!hasApiKey) {
-    return <ApiKeyModal onSuccess={() => setHasApiKey(true)} />;
-  }
 
   return (
     <div className={`flex h-[100dvh] bg-gray-100 dark:bg-slate-900 overflow-hidden relative transition-colors duration-300`}>

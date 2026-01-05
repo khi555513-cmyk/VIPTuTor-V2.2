@@ -1,9 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { UserProfile, AccountTier, DailyUsage } from '../types';
-import { User, Camera, Save, CreditCard, LogOut, Crown, Star, CheckCircle, Zap, Shield, MessageCircle, AlertTriangle, Key, Activity, RefreshCw } from 'lucide-react';
+import { User, Camera, Save, CreditCard, LogOut, Crown, Star, CheckCircle, Zap, Shield, MessageCircle, AlertTriangle, Key, Activity } from 'lucide-react';
 import { TIER_LIMITS, SUBSCRIPTION_PACKAGES, ZALO_CONSULTATION_URL, ACTIVATION_CODES } from '../constants';
-import { getApiKey, clearApiKey } from '../services/geminiService';
 
 interface UserProfileProps {
   profile: UserProfile;
@@ -35,9 +34,6 @@ const UserProfileView: React.FC<UserProfileProps> = ({
   const [isActivationOpen, setIsActivationOpen] = useState(false);
   const [activationCode, setActivationCode] = useState('');
   const [activationMsg, setActivationMsg] = useState<{type: 'success'|'error', text: string} | null>(null);
-  
-  // API Key State
-  const [currentApiKey, setCurrentApiKey] = useState(getApiKey() || '');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,14 +56,6 @@ const UserProfileView: React.FC<UserProfileProps> = ({
 
   const handleContactZalo = () => {
     window.open(ZALO_CONSULTATION_URL, '_blank');
-  };
-  
-  const handleResetApiKey = () => {
-    if (confirm("Bạn có chắc muốn xóa API Key hiện tại? Bạn sẽ cần nhập Key mới để tiếp tục sử dụng.")) {
-      clearApiKey();
-      setCurrentApiKey('');
-      window.location.reload(); // Reload to trigger the ApiKeyModal again
-    }
   };
   
   const handleActivateCode = () => {
@@ -154,12 +142,6 @@ const UserProfileView: React.FC<UserProfileProps> = ({
     }
   };
   
-  const getMaskedKey = (key: string) => {
-     if (!key) return "Chưa cấu hình";
-     if (key.length < 10) return "******";
-     return `${key.substring(0, 6)}...${key.substring(key.length - 4)}`;
-  };
-
   const limits = TIER_LIMITS[profile.accountTier];
 
   return (
@@ -344,30 +326,7 @@ const UserProfileView: React.FC<UserProfileProps> = ({
             </div>
           </div>
           
-          {/* 3. API Key Configuration */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6">
-             <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-gray-800 flex items-center gap-2 text-base md:text-lg">
-                  <Key className="w-5 h-5 text-gray-600" />
-                  Cấu hình API Key
-                </h3>
-                <button 
-                  onClick={handleResetApiKey}
-                  className="text-xs flex items-center gap-1 text-gray-500 hover:text-indigo-600 transition-colors border px-2 py-1 rounded bg-gray-50 hover:bg-indigo-50"
-                >
-                  <RefreshCw className="w-3 h-3" /> Đổi Key
-                </button>
-             </div>
-             
-             <div className="bg-gray-100 p-3 rounded-lg flex justify-between items-center">
-                <span className="font-mono text-gray-600">{getMaskedKey(currentApiKey)}</span>
-                <div className="flex items-center gap-1 text-green-600 text-xs font-bold">
-                  <Shield className="w-3 h-3" /> Được bảo mật
-                </div>
-             </div>
-          </div>
-
-          {/* 4. Pricing & Activation Section */}
+          {/* 3. Pricing & Activation Section */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6">
              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>

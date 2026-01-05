@@ -3,29 +3,24 @@ import { GoogleGenAI } from "@google/genai";
 import { Attachment, TutorMode } from '../types';
 import { getSystemInstruction } from '../constants';
 
-const STORAGE_KEY = 'gemini_api_key';
-// Key mặc định đã bị vô hiệu hóa vì lý do bảo mật. 
-// Người dùng cần nhập key riêng của họ thông qua giao diện UI.
-const DEFAULT_API_KEY = '';
-
 // Helper to safely retrieve API Key
 export const getApiKey = (): string | undefined => {
-  // 1. Priority: Check Local Storage (User entered key via UI)
-  if (typeof window !== 'undefined') {
-    const storedKey = localStorage.getItem(STORAGE_KEY);
-    if (storedKey && storedKey.trim().length > 0) {
-      return storedKey;
+  // 0. Check Local Storage (User provided key via Modal)
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+       const storedKey = localStorage.getItem('gemini_api_key');
+       if (storedKey) return storedKey;
     }
-  }
+  } catch (e) {}
 
-  // 2. Check Vite Env (Standard for Vite apps)
+  // 1. Check Vite Env (Standard for Vite apps)
   // @ts-ignore
   if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
     // @ts-ignore
     return import.meta.env.VITE_API_KEY;
   }
 
-  // 3. Fallback: Check Process Env (Legacy/Build time)
+  // 2. Fallback: Check Process Env (Legacy/Build time)
   try {
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
       return process.env.API_KEY;
@@ -34,36 +29,26 @@ export const getApiKey = (): string | undefined => {
     // Ignore ReferenceError
   }
   
-  // 4. Return the hardcoded default key (Empty string forces UI prompt)
-  return DEFAULT_API_KEY;
+  return undefined;
 };
 
-// Clear API Key
-export const clearApiKey = () => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem(STORAGE_KEY);
-  }
-};
-
-// Validate Key
-export const validateApiKey = async (key: string): Promise<{valid: boolean, error?: string}> => {
+export const validateApiKey = async (apiKey: string): Promise<{ valid: boolean; error?: string }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: key });
-    // Use gemini-2.5-flash-latest for validation as it is widely available
+    const ai = new GoogleGenAI({ apiKey });
+    // Minimal request to validate key using the latest flash model
     await ai.models.generateContent({
-      model: 'gemini-2.5-flash-latest', 
-      contents: { parts: [{ text: "ping" }] },
+        model: 'gemini-3-flash-preview',
+        contents: { parts: [{ text: 'Ping' }] }
     });
     return { valid: true };
   } catch (error: any) {
-    console.error("API Key Validation Failed:", error);
-    let msg = "Kết nối thất bại.";
-    if (error.message) {
-        if (error.message.includes('API_KEY_INVALID')) msg = "API Key không hợp lệ.";
-        else if (error.message.includes('403')) msg = "API Key không có quyền truy cập hoặc hết hạn mức.";
-        else msg = error.message;
+    console.warn("API Key Validation Failed:", error);
+    let errorMsg = error.message || "Unknown error";
+    // Check for common auth errors
+    if (errorMsg.includes('403') || errorMsg.includes('API key not valid') || errorMsg.includes('PERMISSION_DENIED')) {
+        errorMsg = "API Key không hợp lệ hoặc không có quyền truy cập model.";
     }
-    return { valid: false, error: msg };
+    return { valid: false, error: errorMsg };
   }
 };
 
@@ -75,9 +60,9 @@ export const generateTutorResponse = async (
   const apiKey = getApiKey();
 
   if (!apiKey) {
-    return `⚠️ **CHƯA CÓ API KEY**\n\n` +
-           `Hệ thống chưa tìm thấy cấu hình API Key hợp lệ.\n` +
-           `Vui lòng nhập API Key trong phần Cài đặt hoặc tải lại trang để nhập key mới.`;
+    return `⚠️ **Lỗi Cấu Hình Hệ Thống**\n\n` +
+           `Hệ thống chưa tìm thấy API Key.\n` +
+           `Vui lòng cập nhật API Key trong phần Cài đặt hoặc liên hệ quản trị viên.`;
   }
 
   try {
@@ -127,12 +112,10 @@ export const generateTutorResponse = async (
     const systemInstruction = getSystemInstruction(mode);
 
     // --- MODEL SELECTION STRATEGY ---
-    // 1. Primary: Gemini 2.5 Flash Latest (Fast & Capable)
-    // 2. Secondary: Gemini 2.5 Flash (Fallback)
-    
+    // Updated to use Gemini 3 Flash as primary for speed and quality
     const modelsToTry = [
-        'gemini-2.5-flash-latest', 
-        'gemini-2.5-flash' 
+        'gemini-3-flash-preview',
+        'gemini-2.5-flash-latest'
     ];
 
     let lastError;
@@ -160,15 +143,33 @@ export const generateTutorResponse = async (
 
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    // @ts-ignore
-    const msg = error?.message || '';
     
-    if (msg.includes('API_KEY_INVALID') || msg.includes('API Key not found') || msg.includes('403') || msg.includes('PERMISSION_DENIED')) {
-        // Specific handling for the "Leaked Key" or "Permission Denied" error
-        clearApiKey(); // Clear invalid key to force re-entry
-        return `🚫 **API Key Đã Bị Chặn**\n\nKey hiện tại đã bị Google vô hiệu hóa (do lộ key hoặc hết hạn mức).\n\nHệ thống đã tự động xóa key lỗi. Vui lòng **Tải lại trang (F5)** để nhập API Key mới.`;
+    // Robust error message extraction
+    let errorMsg = '';
+    if (error instanceof Error) {
+        errorMsg = error.message;
+    } else if (typeof error === 'object') {
+        try {
+            errorMsg = JSON.stringify(error);
+        } catch (e) {
+            errorMsg = String(error);
+        }
+    } else {
+        errorMsg = String(error);
+    }
+    
+    // Check for Leaked Key / Permission Denied (403)
+    const isPermissionError = 
+        errorMsg.includes('API_KEY_INVALID') || 
+        errorMsg.includes('API Key not found') || 
+        errorMsg.includes('403') || 
+        errorMsg.includes('PERMISSION_DENIED') ||
+        errorMsg.includes('leaked');
+
+    if (isPermissionError) {
+        return `🚫 **Lỗi Dịch Vụ AI**\n\nKhóa API hiện tại đã bị từ chối truy cập (Leaked/Expired/Permission Denied).\n\nVui lòng kiểm tra lại API Key trong cài đặt.`;
     }
 
-    return `**Lỗi kết nối với Gia sư AI:**\n\n${msg}\n\nVui lòng kiểm tra kết nối mạng hoặc thử lại sau.`;
+    return `**Lỗi kết nối với Gia sư AI:**\n\n${errorMsg}\n\nVui lòng kiểm tra kết nối mạng hoặc thử lại sau.`;
   }
 };
