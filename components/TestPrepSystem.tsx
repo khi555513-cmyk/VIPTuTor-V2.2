@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   FileText, Clock, Upload, CheckCircle, AlertCircle, 
@@ -103,9 +102,12 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
         Hãy tạo JSON đề thi theo đúng format yêu cầu. Chú ý tạo đầy đủ các phần: Phonetics, Grammar, Reading (có passageContent), Writing.
       `;
 
-      // Use Claude Opus for best reasoning in exam creation
-      const response = await window.puter.ai.chat(prompt, { model: 'claude-opus-4-5' });
-      const text = response.message.content[0].text || "";
+      // Use Claude Sonnet for better stability on free tier
+      const response = await window.puter.ai.chat(prompt, { model: 'claude-sonnet-4-5' });
+      let text = response.message.content[0].text || "";
+      
+      // Clean up markdown blocks if present
+      text = text.replace(/```json\n?|\n?```/g, '');
       
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       
@@ -120,11 +122,11 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
         // Go to Preview Step
         setStep('preview');
       } else {
-        throw new Error("Could not parse exam JSON");
+        throw new Error("Could not parse exam JSON from response.");
       }
     } catch (e) {
       console.error(e);
-      alert("Lỗi khi tạo đề thi với Claude. Vui lòng thử lại.");
+      alert("Lỗi khi tạo đề thi với Claude. Vui lòng thử lại sau vài giây.");
       setStep('config');
     }
   };
@@ -216,9 +218,12 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
         Hãy chấm điểm theo đúng format JSON yêu cầu.
       `;
 
-      // Use Claude Opus for grading accuracy
-      const response = await window.puter.ai.chat(prompt, { model: 'claude-opus-4-5' });
-      const text = response.message.content[0].text || "";
+      // Use Claude Sonnet for grading
+      const response = await window.puter.ai.chat(prompt, { model: 'claude-sonnet-4-5' });
+      let text = response.message.content[0].text || "";
+      
+      // Clean up markdown blocks if present
+      text = text.replace(/```json\n?|\n?```/g, '');
 
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       
@@ -306,7 +311,7 @@ const TestPrepSystem: React.FC<TestPrepSystemProps> = ({
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-gray-800 leading-tight">Hệ Thống Luyện Thi VIP Pro</h1>
-              <p className="text-gray-500 text-sm md:text-base">Thiết kế đề thi chuẩn 99% - Phân tích chuyên sâu (Powered by Claude Opus)</p>
+              <p className="text-gray-500 text-sm md:text-base">Thiết kế đề thi chuẩn 99% - Phân tích chuyên sâu (Powered by Claude AI)</p>
             </div>
           </div>
 

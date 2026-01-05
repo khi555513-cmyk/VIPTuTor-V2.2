@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DOCUMENT_LIBRARY, ZALO_CONSULTATION_URL } from '../constants';
 import { DocumentItem, AccountTier } from '../types';
@@ -228,6 +227,7 @@ const DocumentLibrary: React.FC<DocumentLibraryProps> = ({ userTier, onUpgradeRe
                           src={previewDoc.downloadUrl && previewDoc.downloadUrl !== '#' ? `${previewDoc.downloadUrl}#toolbar=0` : SAMPLE_PDF_URI}
                           className="w-full h-full border-none"
                           title={previewDoc.title}
+                          type="application/pdf"
                       />
                       {/* Overlay for demo items to manage expectations */}
                       {(!previewDoc.downloadUrl || previewDoc.downloadUrl === '#') && (
