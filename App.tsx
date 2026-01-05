@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
@@ -126,11 +124,6 @@ const App: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [fullScreenGameData, setFullScreenGameData] = useState<GameData | null>(null);
 
-  // Theme State
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('vip_tutor_theme') as 'light' | 'dark') || 'light';
-  });
-
   // Expiry Modal State
   const [showExpiryModal, setShowExpiryModal] = useState(false);
   const [expiredPackageName, setExpiredPackageName] = useState('');
@@ -161,25 +154,15 @@ const App: React.FC = () => {
     if (!isResettingRef.current) localStorage.setItem('vip_tutor_usage', JSON.stringify(dailyUsage));
   }, [dailyUsage]);
 
-  useEffect(() => {
-    localStorage.setItem('vip_tutor_theme', theme);
-    // Apply theme to document
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
   // --- NEW FEATURE NOTIFICATION CHECK ---
   useEffect(() => {
-    const hasSeenUpdate = localStorage.getItem('has_seen_update_v2_1'); // Version bump key
+    const hasSeenUpdate = localStorage.getItem('has_seen_update_v2_2'); // Version bump key
     if (!hasSeenUpdate) {
       // 1. Add notification
       const updateNotification: AppNotification = {
         id: Date.now().toString(),
         title: 'Cập nhật Tính năng Mới! 🎉',
-        message: 'Ứng dụng vừa được nâng cấp: Chế độ Tối/Sáng, Đồng hồ hiển thị thời gian và Kho Tài Liệu Ôn Thi mới! Khám phá ngay.',
+        message: 'Ứng dụng vừa được nâng cấp: Chế độ Tối/Sáng đã được loại bỏ để tập trung vào trải nghiệm học tập tốt nhất.',
         type: 'tip',
         timestamp: Date.now(),
         isRead: false
@@ -208,7 +191,7 @@ const App: React.FC = () => {
         console.warn("Audio playback failed or blocked");
       }
 
-      localStorage.setItem('has_seen_update_v2_1', 'true');
+      localStorage.setItem('has_seen_update_v2_2', 'true');
     }
   }, []);
 
@@ -479,7 +462,14 @@ const App: React.FC = () => {
           onDelete={handleDeleteNotification} 
           onMarkRead={handleMarkNotificationRead}
           onPlayGameFromNotification={(data) => {
-             setFullScreenGameData(data);
+             // Play from notification -> Launch Full Screen Game
+             if (checkLimit('game')) {
+               incrementUsage('game');
+               setFullScreenGameData(data);
+             } else {
+               setLimitModalMessage("Bạn đã hết lượt chơi game hôm nay. Vui lòng nâng cấp gói để chơi thêm!");
+               setIsLimitModalOpen(true);
+             }
           }}
         />
       );
@@ -503,7 +493,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`flex h-[100dvh] bg-gray-100 dark:bg-slate-900 overflow-hidden relative transition-colors duration-300 ${theme}`}>
+    <div className={`flex h-[100dvh] bg-gray-100 dark:bg-slate-900 overflow-hidden relative transition-colors duration-300`}>
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       
       <SubscriptionExpiredModal 
@@ -527,7 +517,8 @@ const App: React.FC = () => {
       />
 
       {fullScreenGameData && (
-        <div className="fixed inset-0 z-50 bg-gray-100 dark:bg-slate-900 animate-fade-in flex flex-col">
+        // Increased Z-Index to 100 to cover Sidebar (z-50)
+        <div className="fixed inset-0 z-[100] bg-gray-100 dark:bg-slate-900 animate-fade-in flex flex-col">
           <MiniGame 
              data={fullScreenGameData} 
              isFullScreenMode={true} 
@@ -554,8 +545,6 @@ const App: React.FC = () => {
           unreadNotificationsCount={unreadCount}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          theme={theme}
-          toggleTheme={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
         />
       </div>
 

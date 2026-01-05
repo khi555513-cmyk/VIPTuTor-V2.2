@@ -1,8 +1,6 @@
 
-
-
 import React from 'react';
-import { MessageSquare, Book, Clock, Plus, Trash2, HelpCircle, Bell, PenTool, ChevronLeft, ChevronRight, GraduationCap, Settings, FolderOpen, Sun, Moon } from 'lucide-react';
+import { MessageSquare, Book, Clock, Plus, Trash2, HelpCircle, Bell, PenTool, ChevronLeft, ChevronRight, GraduationCap, Settings, FolderOpen } from 'lucide-react';
 import { SavedKnowledgeItem, ChatSession } from '../types';
 import RealTimeClock from './RealTimeClock';
 
@@ -19,8 +17,6 @@ interface SidebarProps {
   unreadNotificationsCount: number;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -35,9 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onOpenHelp,
   unreadNotificationsCount,
   isCollapsed,
-  onToggleCollapse,
-  theme,
-  toggleTheme
+  onToggleCollapse
 }) => {
 
   const NavButton = ({ 
@@ -201,13 +195,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-3 border-t border-slate-800 space-y-2">
         <div className={`flex items-center justify-between px-2 py-1 ${isCollapsed ? 'flex-col gap-2' : ''}`}>
            <RealTimeClock />
-           <button 
-             onClick={toggleTheme}
-             title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-             className="p-1.5 text-slate-400 hover:text-yellow-400 transition-colors"
-           >
-             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-           </button>
         </div>
 
         <NavButton 
