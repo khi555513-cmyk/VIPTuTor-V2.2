@@ -3,6 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 import { Attachment, TutorMode } from '../types';
 import { getSystemInstruction } from '../constants';
 
+const DEFAULT_API_KEY = 'AIzaSyBI4BP3mcdnuMhk0nqE-eXsTmt-jwumqE8';
+
 // Helper to safely retrieve API Key
 export const getApiKey = (): string | undefined => {
   // 0. Check Local Storage (User provided key via Modal)
@@ -29,7 +31,8 @@ export const getApiKey = (): string | undefined => {
     // Ignore ReferenceError
   }
   
-  return undefined;
+  // 3. Return the hardcoded default key
+  return DEFAULT_API_KEY;
 };
 
 export const validateApiKey = async (apiKey: string): Promise<{ valid: boolean; error?: string }> => {
